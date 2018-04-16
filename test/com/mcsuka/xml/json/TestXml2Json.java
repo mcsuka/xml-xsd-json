@@ -25,31 +25,21 @@ public class TestXml2Json {
         }
     }
 
-    private static String xml2json(String xmlFileName, boolean ignoreAttributes) {
-        try {
-            String xmlFile = GenericTools.getResourceFile(xmlFileName);
-            Xml2Json xml2json = new Xml2Json(ignoreAttributes);
-            JsonElement o = xml2json.translate(xmlFile);
-            return json2String(o);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    private static String xml2json(String xmlFileName, boolean ignoreAttributes) throws Exception {
+        String xmlFile = GenericTools.getResourceFile(xmlFileName);
+        Xml2Json xml2json = new Xml2Json(ignoreAttributes);
+        JsonElement o = xml2json.translate(xmlFile);
+        return json2String(o);
     }
 
-    private static String xml2jsonNs(String xsdFileName, String rootElem, String xmlFileName, boolean ignoreAttributes) {
-        try {
-            String xmlFile = GenericTools.getResourceFile(xmlFileName);
-            SchemaParser model = SchemaParserFactory.newSchemaParser(xsdFileName, new XsdDocumentSource());
-            SchemaNode grammar = model.parse(rootElem);
+    private static String xml2jsonNs(String xsdFileName, String rootElem, String xmlFileName, boolean ignoreAttributes) throws Exception {
+        String xmlFile = GenericTools.getResourceFile(xmlFileName);
+        SchemaParser model = SchemaParserFactory.newSchemaParser(xsdFileName, new XsdDocumentSource());
+        SchemaNode grammar = model.parse(rootElem);
 
-            Xml2Json xml2json = new Xml2Json(ignoreAttributes, grammar);
-            JsonElement o = xml2json.translate(xmlFile);
-            return json2String(o);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        Xml2Json xml2json = new Xml2Json(ignoreAttributes, grammar);
+        JsonElement o = xml2json.translate(xmlFile);
+        return json2String(o);
     }
 
     @Test
