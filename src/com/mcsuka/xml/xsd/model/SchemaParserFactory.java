@@ -25,11 +25,14 @@ public class SchemaParserFactory {
         SchemaParser model = modelCache.get(url);
         if (model == null) {
             model = new SchemaParser(url, docSource);
-            return modelCache.putIfAbsent(url, model);
+            SchemaParser oldModel = modelCache.putIfAbsent(url, model);
+            if (oldModel != null) {
+                return oldModel;
+            }
         } else {
             logger.fine("XSD model found in cache: " + url);
-            return model;
         }
+        return model;
     }
 
     /**
