@@ -1,0 +1,19 @@
+{
+  "address": [
+    {
+      "street": "strt",
+      "houseNumber": 1,
+      "postCode": "zip",
+      "city": "cty",
+      "municipality": {
+        "x": "x",
+        "_content": "Rotterdam"
+      },
+      "info": {
+        "name": "name1",
+        "phone": "12345678",
+        "email": "e@mail.com"
+      }
+    }
+  ]
+}

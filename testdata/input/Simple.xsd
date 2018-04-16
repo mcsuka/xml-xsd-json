@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://dummy.org/1231312" targetNamespace="http://dummy.org/1231312" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xs:element name="root1" type="type_Body_1"/>
+	<xs:element name="root2" type="type_Body_2"/>
+	<xs:element name="root3">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="address" maxOccurs="2">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="street" type="xs:string"/>
+							<xs:element name="houseNumber" type="xs:int"/>
+							<xs:element name="postCode" type="xs:string"/>
+							<xs:element name="city" type="xs:string"/>
+							<xs:element name="municipality">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:anyAttribute processContents="skip"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="info">
+								<xs:complexType mixed="true">
+									<xs:sequence>
+										<xs:any maxOccurs="10" processContents="skip"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="municipality">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:boolean">
+					<xs:attribute name="x" use="required" fixed="x"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="type_Address">
+		<xs:sequence>
+			<xs:element name="street" type="xs:string"/>
+			<xs:element name="houseNumber" type="xs:int"/>
+			<xs:element name="postCode" type="xs:string"/>
+			<xs:element name="city" type="xs:string"/>
+			<xs:element ref="municipality"/>
+			<xs:element name="address" type="type_Address" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="type_Body_1">
+		<xs:sequence>
+			<xs:element name="address" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="type_Address">
+							<xs:sequence minOccurs="0">
+								<xs:element name="addres" type="xs:int"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="type_Body_2">
+		<xs:sequence>
+			<xs:element name="address" type="type_Address"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

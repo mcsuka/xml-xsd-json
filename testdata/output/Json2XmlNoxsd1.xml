@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root2>
+   <address>
+      <houseNumber>1</houseNumber>
+      <street>strt</street>
+      <postCode>zip</postCode>
+      <city>cty</city>
+      <municipality>true</municipality>
+      <address>
+         <postCode>zip2</postCode>
+         <street>strt2</street>
+         <houseNumber>2</houseNumber>
+         <city>cty2</city>
+         <municipality>false</municipality>
+      </address>
+      <address>
+         <postCode>zip3</postCode>
+         <street>strt3</street>
+         <municipality>
+            <x>y</x>
+            <content>false</content>
+         </municipality>
+         <houseNumber>3</houseNumber>
+         <city>cty3</city>
+      </address>
+   </address>
+</root2>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://dummy.org/types/Skeleton.xsd" xmlns:ns1="http://dummy.org/types/Header.xsd" targetNamespace="http://dummy.org/types/Skeleton.xsd" elementFormDefault="unqualified">
+	<import namespace="http://dummy.org/types/Header.xsd" schemaLocation="./Header.xsd"/>
+	<complexType name="type_Skeleton" abstract="true">
+		<sequence>
+			<element name="header" type="ns1:type_Header"/>
+		</sequence>
+	</complexType>
+</schema>

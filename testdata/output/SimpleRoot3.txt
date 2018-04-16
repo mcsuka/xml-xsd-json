@@ -1,0 +1,13 @@
+SimpleXSDModelNode {/root3, COMPLEX, 1..1, NS:http://dummy.org/1231312, QUALIFIED, "null", "null"}
+SimpleXSDModelNode {/root3/, sequence, 1..1}
+SimpleXSDModelNode {/root3/address, COMPLEX, 1..2, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/root3/address/, sequence, 1..1}
+SimpleXSDModelNode {/root3/address/street, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/root3/address/houseNumber, INTEGER, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/root3/address/postCode, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/root3/address/city, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/root3/address/municipality, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/root3/address/municipality/*, ANY, 0..2147483647, NS:http://dummy.org/1231312, UNQUALIFIED, ATTR, ANY, "null", "null"}
+SimpleXSDModelNode {/root3/address/info, MIXED, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/root3/address/info/, sequence, 1..1}
+SimpleXSDModelNode {/root3/address/info/*, ANY, 1..10, NS:http://dummy.org/1231312, UNQUALIFIED, ANY, "null", "null"}

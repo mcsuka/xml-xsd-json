@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns:root3 xsi:schemaLocation="http://dummy.org/1231312 Simple.xsd" xmlns:ns="http://dummy.org/1231312" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+	<address>
+		<street>strt</street>
+		<houseNumber>1</houseNumber>
+		<postCode>zip</postCode>
+		<city>cty</city>
+		<municipality x="x">Rotterdam</municipality>
+		<info>
+			<name>name1</name>
+			<phone>12345678</phone>
+			<email>e@mail.com</email>
+		</info>
+	</address>
+</ns:root3>

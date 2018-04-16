@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://dummy.org/types/Header.xsd" xmlns:ns1="http://dummy.org/types/Priority.xsd" targetNamespace="http://dummy.org/types/Header.xsd" elementFormDefault="unqualified">
+	<import namespace="http://dummy.org/types/Priority.xsd" schemaLocation="./Priority.xsd"/>
+	<complexType name="type_Header">
+		<annotation>
+			<documentation>Message Header</documentation>
+		</annotation>
+		<sequence>
+			<element name="messageID" type="string">
+				<annotation>
+					<documentation>Unique ID for this message</documentation>
+				</annotation>
+			</element>
+			<element name="timestamp" type="dateTime">
+				<annotation>
+					<documentation>The timestamp of each message birth</documentation>
+				</annotation>
+			</element>
+			<element name="userID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>A valid user</documentation>
+				</annotation>
+			</element>
+			<element name="priority" type="ns1:type_Priority" minOccurs="0">
+				<annotation>
+					<documentation>Message priority</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+</schema>

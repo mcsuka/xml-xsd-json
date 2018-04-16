@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://dummy.org/types/Data.xsd" targetNamespace="http://dummy.org/types/Data.xsd" elementFormDefault="unqualified">
+	<complexType name="type_Data">
+		<annotation>
+			<documentation>Some data</documentation>
+		</annotation>
+		<sequence>
+			<element name="customerType" type="string"/>
+			<element name="customerId" type="int"/>
+			<element name="products" minOccurs="0">
+				<complexType>
+					<sequence>
+						<element name="productId" type="string" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+</schema>

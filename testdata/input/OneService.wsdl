@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:ns0="http://dummy.net/RequestMessage.xsd" xmlns:ns2="http://dummy.net/types/type_Priority.xsd" xmlns:ns1="http://dummy.net/ReplyMessage.xsd" xmlns:ns4="http://dummy.net/types/type_MessageHeader.xsd" xmlns:ns3="http://dummy.net/types/type_Result.xsd" xmlns:ns6="http://dummy.net/types/type_DateTimeWithTimezone.xsd" xmlns:ns5="http://dummy.net/types/type_ResultCode.xsd" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns7="http://dummy.net/types/type_Contract.xsd" xmlns:ns13="http://dummy.net/types/type_ContractID.xsd" xmlns:ns9="http://dummy.net/types/type_Reason.xsd" xmlns:ns12="http://dummy.net/types/type_ContractReference.xsd" xmlns:ns11="http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd" xmlns:tns="http://dummy.net/webservices/OneService.wsdl" xmlns:ns16="http://dummy.net/types/type_Messaging_MGUID.xsd" xmlns:ns15="http://dummy.net/types/type_CustomerCode.xsd" xmlns:ns14="http://dummy.net/types/type_MessageSkeleton_2.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" name="Untitled" targetNamespace="http://dummy.net/webservices/OneService.wsdl">
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_p="http://dummy.net/types/type_Priority.xsd" targetNamespace="http://dummy.net/types/type_Priority.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<simpleType name="type_Priority">
+				<restriction base="int">
+					<maxInclusive value="10"/>
+					<minInclusive value="0"/>
+				</restriction>
+			</simpleType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_rc="http://dummy.net/types/type_ResultCode.xsd" xmlns:gen_r="http://dummy.net/types/type_Result.xsd" targetNamespace="http://dummy.net/types/type_Result.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<import namespace="http://dummy.net/types/type_ResultCode.xsd"/>
+			<complexType name="type_Result">
+				<sequence>
+					<element name="resultCode" type="gen_rc:type_ResultCode"/>
+					<element name="resultText" type="string"/>
+				</sequence>
+			</complexType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_mh="http://dummy.net/types/type_MessageHeader.xsd" xmlns:gen_mmg="http://dummy.net/types/type_Messaging_MGUID.xsd" xmlns:gen_dtw="http://dummy.net/types/type_DateTimeWithTimezone.xsd" xmlns:gen_p="http://dummy.net/types/type_Priority.xsd" targetNamespace="http://dummy.net/types/type_MessageHeader.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<import namespace="http://dummy.net/types/type_Priority.xsd"/>
+			<import namespace="http://dummy.net/types/type_DateTimeWithTimezone.xsd"/>
+			<complexType name="type_MessageHeader">
+				<annotation>
+					<documentation>Message Header</documentation>
+				</annotation>
+				<sequence>
+					<element name="messageID" type="string">
+						<annotation>
+							<documentation>Unique ID</documentation>
+						</annotation>
+					</element>
+					<element name="timestamp" type="gen_dtw:type_DateTimeWithTimezone">
+						<annotation>
+							<documentation>The timestamp of each message birth</documentation>
+						</annotation>
+					</element>
+					<element name="userID" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Unique user identifier</documentation>
+						</annotation>
+					</element>
+					<element name="priority" type="gen_p:type_Priority" minOccurs="0">
+						<annotation>
+							<documentation>Message priority (not used at the moment)</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</complexType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_rc="http://dummy.net/types/type_ResultCode.xsd" targetNamespace="http://dummy.net/types/type_ResultCode.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<simpleType name="type_ResultCode">
+				<restriction base="integer"/>
+			</simpleType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_dtw="http://dummy.net/types/type_DateTimeWithTimezone.xsd" targetNamespace="http://dummy.net/types/type_DateTimeWithTimezone.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<simpleType name="type_DateTimeWithTimezone">
+				<restriction base="dateTime">
+					<pattern value=".+T.+(Z|[+\-].+)"/>
+				</restriction>
+			</simpleType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:con_ntf="http://dummy.net/RequestMessage.xsd" xmlns:gen_crm="http://dummy.net/types/type_ContractReference.xsd" xmlns:gen_crb="http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd" xmlns:gen_ms="http://dummy.net/types/type_MessageSkeleton_2.xsd" xmlns:gen_r="http://dummy.net/types/type_Reason.xsd" targetNamespace="http://dummy.net/RequestMessage.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<import namespace="http://dummy.net/types/type_Reason.xsd"/>
+			<import namespace="http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd"/>
+			<import namespace="http://dummy.net/types/type_ContractReference.xsd"/>
+			<import namespace="http://dummy.net/types/type_MessageSkeleton_2.xsd"/>
+			<complexType name="type_Body">
+				<sequence>
+					<element name="contract" type="gen_crb:type_ContractReferenceAndCustomerCode"/>
+					<element name="cards" minOccurs="0">
+						<annotation>
+							<documentation>Related contracts</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element name="card" type="gen_crm:type_ContractReference" maxOccurs="unbounded">
+									<annotation>
+										<documentation>Identifies the contract</documentation>
+									</annotation>
+								</element>
+							</sequence>
+						</complexType>
+					</element>
+					<element name="reason" type="gen_r:type_Reason"/>
+				</sequence>
+			</complexType>
+			<complexType name="type_RequestMessage">
+				<complexContent>
+					<extension base="gen_ms:type_MessageSkeleton_2">
+						<sequence>
+							<element name="body" type="con_ntf:type_Body"/>
+						</sequence>
+					</extension>
+				</complexContent>
+			</complexType>
+			<element name="RequestMessage" type="con_ntf:type_RequestMessage"/>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen="http://dummy.net/types/type_Contract.xsd" targetNamespace="http://dummy.net/types/type_Contract.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<complexType name="type_Contract" abstract="true">
+				<annotation>
+					<documentation>Base abstract Contract Class</documentation>
+				</annotation>
+			</complexType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_r="http://dummy.net/types/type_Reason.xsd" targetNamespace="http://dummy.net/types/type_Reason.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<complexType name="type_Reason">
+				<sequence>
+					<element name="code" type="string"/>
+					<element name="description" type="string"/>
+				</sequence>
+			</complexType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_cc="http://dummy.net/types/type_CustomerCode.xsd" xmlns:gen="http://dummy.net/types/type_Contract.xsd" xmlns:gen_crb="http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd" xmlns:gen_msi="http://dummy.net/types/type_ContractID.xsd" targetNamespace="http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<import namespace="http://dummy.net/types/type_Contract.xsd"/>
+			<import namespace="http://dummy.net/types/type_ContractID.xsd"/>
+			<import namespace="http://dummy.net/types/type_CustomerCode.xsd"/>
+			<complexType name="type_ContractReferenceAndCustomerCode">
+				<annotation>
+					<documentation>ContractReferenceByMSISDN references a Contract by MSISDN and customerCode</documentation>
+				</annotation>
+				<complexContent>
+					<extension base="gen:type_Contract">
+						<sequence>
+							<element name="contractID" type="gen_msi:type_ContractID"/>
+							<element name="customerCode" type="gen_cc:type_CustomerCode"/>
+						</sequence>
+					</extension>
+				</complexContent>
+			</complexType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen="http://dummy.net/types/type_Contract.xsd" xmlns:gen_crb="http://dummy.net/types/type_ContractReference.xsd" xmlns:gen_msi="http://dummy.net/types/type_ContractID.xsd" targetNamespace="http://dummy.net/types/type_ContractReference.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<import namespace="http://dummy.net/types/type_Contract.xsd"/>
+			<import namespace="http://dummy.net/types/type_ContractID.xsd"/>
+			<complexType name="type_ContractReference">
+				<annotation>
+					<documentation>Contract Reference</documentation>
+				</annotation>
+				<complexContent>
+					<extension base="gen:type_Contract">
+						<sequence>
+							<element name="contractID" type="gen_msi:type_ContractID"/>
+						</sequence>
+					</extension>
+				</complexContent>
+			</complexType>
+		</schema>
+		<xsd:schema xmlns="http://dummy.net/ReplyMessage.xsd" xmlns:con_rep="http://dummy.net/ReplyMessage.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gen_ms="http://dummy.net/types/type_MessageSkeleton_2.xsd" xmlns:gen_r="http://dummy.net/types/type_Result.xsd" targetNamespace="http://dummy.net/ReplyMessage.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<xsd:import namespace="http://dummy.net/types/type_MessageSkeleton_2.xsd"/>
+			<xsd:import namespace="http://dummy.net/types/type_Result.xsd"/>
+			<xsd:complexType name="type_Body">
+				<xsd:sequence>
+					<xsd:element name="result" type="gen_r:type_Result"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="type_ReplyMessage">
+				<xsd:complexContent>
+					<xsd:extension base="gen_ms:type_MessageSkeleton_2">
+						<xsd:sequence>
+							<xsd:element name="body" type="con_rep:type_Body"/>
+						</xsd:sequence>
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+			<xsd:element name="ReplyMessage" type="con_rep:type_ReplyMessage"/>
+		</xsd:schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dummy.net/types/type_ContractID.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<simpleType name="type_ContractID">
+				<restriction base="string">
+					<pattern value="\d{10,19}"/>
+				</restriction>
+			</simpleType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_mh="http://dummy.net/types/type_MessageHeader.xsd" xmlns:gen_ms="http://dummy.net/types/type_MessageSkeleton_2.xsd" targetNamespace="http://dummy.net/types/type_MessageSkeleton_2.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<import namespace="http://dummy.net/types/type_MessageHeader.xsd"/>
+			<complexType name="type_MessageSkeleton_2" abstract="true">
+				<sequence>
+					<element name="header" type="gen_mh:type_MessageHeader"/>
+				</sequence>
+			</complexType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_mmg="http://dummy.net/types/type_Messaging_MGUID.xsd" targetNamespace="http://dummy.net/types/type_Messaging_MGUID.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<simpleType name="type_MGUID">
+				<restriction base="string">
+					<maxLength value="32"/>
+				</restriction>
+			</simpleType>
+		</schema>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gen_cc="http://dummy.net/types/type_CustomerCode.xsd" targetNamespace="http://dummy.net/types/type_CustomerCode.xsd" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+			<simpleType name="type_CustomerCode">
+				<restriction base="string">
+					<maxLength value="24"/>
+					<pattern value="[0-9\.]+"/>
+				</restriction>
+			</simpleType>
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="OperationRequest">
+		<wsdl:part name="request" element="ns0:RequestMessage"/>
+	</wsdl:message>
+	<wsdl:message name="OperationResponse">
+		<wsdl:part name="reply" element="ns1:ReplyMessage"/>
+	</wsdl:message>
+	<wsdl:portType name="HttpPort">
+		<wsdl:operation name="Operation">
+			<wsdl:input message="tns:OperationRequest"/>
+			<wsdl:output message="tns:OperationResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="Operation_Binding" type="tns:HttpPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="Operation">
+			<soap:operation soapAction="Operation" style="document"/>
+			<wsdl:input>
+				<soap:body parts="request" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="reply" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="Service">
+		<wsdl:port name="OperationPort" binding="tns:Operation_Binding">
+			<soap:address location="http://localhost:80/Operation"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

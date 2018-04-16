@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://dummy.org/types/Result.xsd" targetNamespace="http://dummy.org/types/Result.xsd" elementFormDefault="unqualified">
+	<complexType name="type_Result">
+		<sequence>
+			<element name="resultCode">
+				<simpleType>
+					<restriction base="int">
+						<enumeration value="0"/>
+						<enumeration value="10"/>
+						<enumeration value="20"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="resultText" type="string"/>
+		</sequence>
+	</complexType>
+</schema>

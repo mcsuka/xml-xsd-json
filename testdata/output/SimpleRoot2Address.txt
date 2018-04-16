@@ -1,0 +1,9 @@
+SimpleXSDModelNode {/address, COMPLEX, 1..1, TYPE:type_Address, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/address/, sequence, 1..1}
+SimpleXSDModelNode {/address/street, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/address/houseNumber, INTEGER, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/address/postCode, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/address/city, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+SimpleXSDModelNode {/address/municipality, BOOLEAN, 1..1, NS:http://dummy.org/1231312, QUALIFIED, "null", "null"}
+SimpleXSDModelNode {/address/municipality/x, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, ATTR, "fixed value: x", "null"}
+SimpleXSDModelNode {/address/address, COMPLEX, 0..2147483647, TYPE:type_Address, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}

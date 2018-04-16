@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://dummy.org/Complex.xsd" xmlns:ns1="http://dummy.org/types/Skeleton.xsd" xmlns:ns2="http://dummy.org/types/Result.xsd" xmlns:ns3="http://dummy.org/types/Data.xsd" targetNamespace="http://dummy.org/Complex.xsd" elementFormDefault="unqualified">
+	<import namespace="http://dummy.org/types/Skeleton.xsd" schemaLocation="types/Skeleton.xsd"/>
+	<import namespace="http://dummy.org/types/Result.xsd" schemaLocation="./types/Result.xsd"/>
+	<import namespace="http://dummy.org/types/Data.xsd" schemaLocation="./types/../types/Data.xsd"/>
+	<element name="root" type="tns:type_Root"/>
+	<complexType name="type_Root">
+		<complexContent>
+			<extension base="ns1:type_Skeleton">
+				<sequence>
+					<element name="body" type="tns:type_Body"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="type_Body">
+		<sequence>
+			<element name="result" type="ns2:type_Result"/>
+			<element name="data" type="ns3:type_Data" minOccurs="0"/>
+		</sequence>
+	</complexType>
+</schema>

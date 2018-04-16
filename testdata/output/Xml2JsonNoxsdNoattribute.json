@@ -1,0 +1,25 @@
+{
+  "address": {
+    "street": "strt",
+    "houseNumber": "1",
+    "postCode": "zip",
+    "city": "cty",
+    "municipality": "true",
+    "address": [
+      {
+        "street": "strt2",
+        "houseNumber": "2",
+        "postCode": "zip2",
+        "city": "cty2",
+        "municipality": "false"
+      },
+      {
+        "street": "strt3",
+        "houseNumber": "3",
+        "postCode": "zip3",
+        "city": "cty3",
+        "municipality": "false"
+      }
+    ]
+  }
+}

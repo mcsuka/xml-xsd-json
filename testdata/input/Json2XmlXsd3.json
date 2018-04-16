@@ -1,0 +1,28 @@
+{"address": [{
+  "houseNumber": 1,
+  "street": "strt1",
+  "postCode": "zip1",
+  "city": "cty1",
+  "municipality": true,
+  "info": {
+    "field1": "some information 1",
+    "field2": 333
+  }
+},
+{
+  "houseNumber": 2,
+  "street": "strt2",
+  "postCode": "zip2",
+  "city": "cty2",
+  "municipality": false,
+  "info": "some information 2"
+},
+{
+  "houseNumber": 3,
+  "street": "strt3",
+  "postCode": "zip3",
+  "city": "cty3",
+  "municipality": true,
+  "info": "some information 3"
+}]
+}
