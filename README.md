@@ -16,9 +16,9 @@ Each SchemaNode has the following properties:
 * minOccurs minimum occurrence of the element, attribute or indicator
 * maxOccurs maximum occurrence of the element, attribute or indicator. Integer.MAX_VALUE is used to define 'unbounded'
 * flags to define a boolean property of the SchemaNode:
-** qualified - whether the element or attribute should be placed in its name space
-** attribute - whether it is an attribute
-** any whether it is an "any" type
+  * qualified - whether the element or attribute should be placed in its name space
+  * attribute - whether it is an attribute
+  * any - whether it is an "any" type
 * w3cType - the basic type of the element or attribute, or COMPLEX/MIXED for complex types
 * customType - the localName of the explicitly defined type
 * documentation - annotation/documentation of the element or type
@@ -31,8 +31,9 @@ The com.mcsuka.xml.json package implements an XML/JSON translator, using the GSO
 Translation may or may not use an XML Schema. Using an XML schema has the following advantages:
 * keep types: the resulting JSON will contain boolean and numeric values without quotes
 * keep arrays: the resulting JSON will contain array for keys that are defined as repeatable elements in the XSD, even if there is only one element in the input XML.
-** please note, you may also use the `_jsonarray="true"` attribute in the input XML to force array creation
-Disadvattages of using an XML Schema:
+  * please note, you may also use the `_jsonarray="true"` attribute in the input XML to force array creation
+
+Disadvattage of using an XML Schema:
 * slightly slower translation
 
 ## JSON to XML translation
@@ -41,12 +42,13 @@ Translation may or may not use an XML Schema. Using an XML schema has the follow
 * add correct namespace to the elements and attributes
 * correct the order of the elements for 'sequence' indicator
 * create missing, mandatory elements and attributes:
-** missing elements and attributes are created with their fixed or default values. If there is no default value defined, a dummy value is chosen, according to the data type
+  * missing elements and attributes are created with their fixed or default values. If there is no default value defined, a dummy value is chosen, according to the data type
 * remove invalid elements:
-** not in the schema
-** over the 'maxOccurs' limit
-** multiple elements inside a choice indicator
-Disadvattages of using an XML Schema:
+  * not in the schema
+  * over the 'maxOccurs' limit
+  * multiple elements inside a choice indicator
+
+Disadvattage of using an XML Schema:
 * slightly slower translation
 
 JSON to XML translation will modify the JSON keys that are not XML element-name compatible. All non-compatible characters will be replaced with an underscore character. Please note, there is no guarantee that the XML produced by the translator is valid (to the schema).
