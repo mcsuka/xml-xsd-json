@@ -27,7 +27,7 @@ Each SchemaNode has the following properties:
 The XML schema can be visualized as a text document using the `dumpTree()` convenience function of the SchemaNode class. Other visualizations (HTML, graphic, ...) can be easily implemented as separate classes.
 
 ## XML to JSON translation
-The com.mcsuka.xml.xsd.json package implements an XML/JSON translator, using the GSON, Xerces and Saxon-HE libraries.
+The com.mcsuka.xml.json package implements an XML/JSON translator, using the GSON, Xerces and Saxon-HE libraries.
 Translation may or may not use an XML Schema. Using an XML schema has the following advantages:
 * keep types: the resulting JSON will contain boolean and numeric values without quotes
 * keep arrays: the resulting JSON will contain array for keys that are defined as repeatable elements in the XSD, even if there is only one element in the input XML.
@@ -36,7 +36,7 @@ Disadvattages of using an XML Schema:
 * slightly slower translation
 
 ## JSON to XML translation
-The com.mcsuka.xml.xsd.json package implements a JSON/XML translator, using the GSON, Xerces and Saxon-HE libraries.
+The com.mcsuka.xml.json package implements a JSON/XML translator, using the GSON, Xerces and Saxon-HE libraries.
 Translation may or may not use an XML Schema. Using an XML schema has the following advantages:
 * add correct namespace to the elements and attributes
 * correct the order of the elements for 'sequence' indicator
