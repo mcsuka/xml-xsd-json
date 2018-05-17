@@ -40,6 +40,7 @@ public class SchemaNode {
     private final boolean attribute;
     private final boolean qualified;
     private String defaultValue;
+    private String unknownValue;
     private final String fixedValue;
     private final String namespace;
     private String documentation;
@@ -115,6 +116,7 @@ public class SchemaNode {
         this.qualified = qualified;
         this.defaultValue = defaultValue;
         this.fixedValue = fixedValue;
+        this.unknownValue = "";
         this.namespace = namespace;
         this.customType = null;
         this.w3cType = (any ? DataType.ANY :DataType.STRING);
@@ -308,6 +310,10 @@ public class SchemaNode {
         return defaultValue;
     }
 
+    public String getOptionalValue() {
+        return defaultValue == null ? unknownValue : defaultValue;
+    }
+
     public String getFixedValue() {
         return fixedValue;
     }
@@ -328,10 +334,8 @@ public class SchemaNode {
         checkRecursion();
     }
 
-    void optDefaultValue(String x) {
-        if (defaultValue == null) {
-            defaultValue = x;
-        }
+    private void setUnknownValue(String x) {
+        unknownValue = x;
     }
     
     public DataType getW3CType() {
@@ -351,36 +355,36 @@ public class SchemaNode {
         if ("byte".equals(w3cTypeName) || "short".equals(w3cTypeName) || "int".equals(w3cTypeName)
                 || "unsignedShort".equals(w3cTypeName) || "unsignedByte".equals(w3cTypeName)) {
             this.w3cType = DataType.INTEGER;
-            optDefaultValue("0");
+            setUnknownValue("0");
         } else if ("integer".equals(w3cTypeName) || "long".equals(w3cTypeName)
                 || "nonNegativeInteger".equals(w3cTypeName) || "nonPositiveInteger".equals(w3cTypeName)
                 || "unsignedLong".equals(w3cTypeName) || "unsignedInt".equals(w3cTypeName)) {
             this.w3cType = DataType.LONG;
-            optDefaultValue("0");
+            setUnknownValue("0");
         } else if ("positiveInteger".equals(w3cTypeName)) {
             this.w3cType = DataType.LONG;
-            optDefaultValue("1");
+            setUnknownValue("1");
         } else if ("negativeInteger".equals(w3cTypeName)) {
             this.w3cType = DataType.LONG;
-            optDefaultValue("-1");
+            setUnknownValue("-1");
         } else if ("decimal".equals(w3cTypeName) || "double".equals(w3cTypeName) || "float".equals(w3cTypeName)) {
             this.w3cType = DataType.DOUBLE;
-            optDefaultValue("0.0");
+            setUnknownValue("0.0");
         } else if ("boolean".equals(w3cTypeName)) {
             this.w3cType = DataType.BOOLEAN;
-            optDefaultValue("false");
+            setUnknownValue("false");
         } else if ("date".equals(w3cTypeName)) {
             this.w3cType = DataType.DATE;
-            optDefaultValue("2000-01-01");
+            setUnknownValue("2000-01-01");
         } else if ("dateTime".equals(w3cTypeName)) {
             this.w3cType = DataType.DATETIME;
-            optDefaultValue("2000-01-01T00:00:00Z");
+            setUnknownValue("2000-01-01T00:00:00Z");
         } else if ("time".equals(w3cTypeName)) {
             this.w3cType = DataType.TIME;
-            optDefaultValue("00:00:00");
+            setUnknownValue("00:00:00");
         } else if ("duration".equals(w3cTypeName)) {
             this.w3cType = DataType.STRING;
-            optDefaultValue("P0S");
+            setUnknownValue("P0S");
         } else {
             this.w3cType = DataType.STRING;
         }
