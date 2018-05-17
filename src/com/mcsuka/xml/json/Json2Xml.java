@@ -111,35 +111,35 @@ public class Json2Xml {
             if (arrayValue instanceof JsonArray) {
                 currLen = walkArray(key, (JsonArray) arrayValue, xmlNode, doc, xsdNode, currLen);
             } else {
-                Element child = null;
                 if (key != null) {
-                    child = createElementNS(xsdNode, key, doc);
-                }
-                if (arrayValue instanceof JsonObject) {
-                    walkObject((JsonObject) arrayValue, child == null ? xmlNode : child, doc, xsdNode);
-                } else if (arrayValue != null) {
-                    if (child == null) {
-                        child = createElementNS(xsdNode, "item", doc);
+                    Element child = createElementNS(xsdNode, key, doc);
+                    if (arrayValue instanceof JsonObject) {
+                        appendChildren((JsonObject) arrayValue, child, doc, xsdNode);
+                    } else if (arrayValue != null) {
+                        if (xsdNode == null || xsdNode.isSimpleType() || xsdNode.isAny()) {
+                            child.setTextContent(arrayValue.getAsString());
+                        }
+                        if (xsdNode != null && !xsdNode.isLeaf()) { // create missing XML elements
+                            appendChildren(new JsonObject(), child, doc, xsdNode);
+                        }
                     }
-                    child.setTextContent(arrayValue.getAsString());
-                    if (xsdNode != null && !xsdNode.isLeaf()) {
-                        walkObject(new JsonObject(), child, doc, xsdNode);
-                    }
-                }
-                if (child != null) {
                     xmlNode.appendChild(child);
                     currLen++;
+                } else {
+                    if (arrayValue instanceof JsonObject) {
+                        appendChildren((JsonObject) arrayValue, xmlNode, doc, xsdNode);
+                    }
                 }
             }
         }
         return currLen;
     }
 
-    private void walkObjectByXsd(JsonObject jsonNode, Element xmlNode, Document doc, SchemaNode childXsdNode, boolean optional) {
+    private void appendChildrenBySchema(JsonObject jsonNode, Element xmlNode, Document doc, SchemaNode childXsdNode, boolean optional) {
         if (childXsdNode.isIndicator()) {
-            boolean optionalChild = optional || childXsdNode.getMinOccurs() == 0;
+            boolean optionalChild = optional || childXsdNode.getMinOccurs() == 0 || childXsdNode.getIndicator() == SchemaNode.IndicatorType.choice;
             for (SchemaNode descendantXsdNode: childXsdNode.getChildren()) {
-                walkObjectByXsd(jsonNode, xmlNode, doc, descendantXsdNode, optionalChild);
+                appendChildrenBySchema(jsonNode, xmlNode, doc, descendantXsdNode, optionalChild);
                 if (xmlNode.hasChildNodes()) {
                     if (childXsdNode.getIndicator() == SchemaNode.IndicatorType.choice) {
                         break;
@@ -148,15 +148,20 @@ public class Json2Xml {
                     }
                 }
             }
+            if (!xmlNode.hasChildNodes() && childXsdNode.getIndicator() == SchemaNode.IndicatorType.choice && childXsdNode.getChildren().size() > 0) {
+                appendChildrenBySchema(jsonNode, xmlNode, doc, childXsdNode.getChildren().get(0), false);
+            }
         } else if (childXsdNode.isAny()) {
             if (childXsdNode.isAttribute()) {  // any Attribute
                 for (String key : jsonNode.keySet()) {
-                    Attr attr = doc.createAttributeNS((childXsdNode.isQualified() ? childXsdNode.getNamespace() : null), key);
-                    attr.setValue(jsonNode.getAsString());
-                    xmlNode.setAttributeNodeNS(attr);
+                    if (!Xml2Json.XML_ELEMENT_CONTENT.equals(key)) {
+                        Attr attr = doc.createAttributeNS((childXsdNode.isQualified() ? childXsdNode.getNamespace() : null), key);
+                        attr.setValue(jsonNode.get(key).getAsString());
+                        xmlNode.setAttributeNodeNS(attr);
+                    }
                 }
             } else {  // any Element
-                walkObjectNoXsd(jsonNode, xmlNode, doc);
+                appendChildrenByValue(jsonNode, xmlNode, doc);
             }
         } else {
             String key = childXsdNode.getElementName();
@@ -167,7 +172,7 @@ public class Json2Xml {
                     if (childXsdNode.getFixedValue() != null) {
                         attr.setValue(childXsdNode.getFixedValue());
                     } else {
-                        attr.setValue(value.toString());
+                        attr.setValue(value.getAsString());
                     }
                     xmlNode.setAttributeNodeNS(attr);
                 } else {
@@ -177,14 +182,18 @@ public class Json2Xml {
                         Element child = createElementNS(childXsdNode, key, doc);
                         if (value instanceof JsonObject) {
                             JsonObject jo = (JsonObject) value;
-                            if (jo.size() > 0) {
-                                if (childXsdNode.isSimpleType() && jo.has(Xml2Json.XML_ELEMENT_CONTENT)) {
+                            if (childXsdNode.isSimpleType()) {
+                                if (childXsdNode.getFixedValue() != null) {
+                                    child.setTextContent(childXsdNode.getFixedValue());
+                                } else if (jo.has(Xml2Json.XML_ELEMENT_CONTENT)) {
                                     child.setTextContent(jo.get(Xml2Json.XML_ELEMENT_CONTENT).getAsString());
+                                } else if (childXsdNode.getDefaultValue() != null) {
+                                    child.setTextContent(childXsdNode.getDefaultValue());
                                 }
-                                walkObject(jo, child, doc, childXsdNode);
                             }
+                            appendChildren(jo, child, doc, childXsdNode);
                         } else {
-                            if (childXsdNode.isSimpleType() || childXsdNode.getW3CType() == DataType.MIXED) {
+                            if (childXsdNode.isSimpleType()) {
                                 if (childXsdNode.getFixedValue() != null) {
                                     child.setTextContent(childXsdNode.getFixedValue());
                                 } else {
@@ -192,25 +201,22 @@ public class Json2Xml {
                                 }
                             }
                             if (!childXsdNode.isLeaf()) {
-                                walkObject(new JsonObject(), child, doc, childXsdNode);
+                                appendChildren(new JsonObject(), child, doc, childXsdNode);
                             }
                         }
                         xmlNode.appendChild(child);
                     }
                 }
-            } else if (childXsdNode.isAttribute() && childXsdNode.getMinOccurs() > 0)  {
+            } else if (childXsdNode.isAttribute() && (childXsdNode.getMinOccurs() > 0 || childXsdNode.getDefaultValue() != null))  {
                 Attr attr = doc.createAttributeNS((childXsdNode.isQualified() ? childXsdNode.getNamespace() : null), key);
-                if (childXsdNode.getDefaultValue() != null) {
-                    attr.setValue(childXsdNode.getDefaultValue());
-                } else {
-                    attr.setValue("");
-                }
+                attr.setValue(childXsdNode.getOptionalValue());
                 xmlNode.setAttributeNodeNS(attr);
             } else if (!optional) {
                 for (int i = 0; i < childXsdNode.getMinOccurs(); i++) {
                     Element child = createElementNS(childXsdNode, key, doc);
-                    if (childXsdNode.getDefaultValue() != null) {
-                        child.setTextContent(childXsdNode.getDefaultValue());
+                    child.setTextContent(childXsdNode.getOptionalValue());
+                    if (!childXsdNode.isLeaf()) {
+                        appendChildren(new JsonObject(), child, doc, childXsdNode);
                     }
                     xmlNode.appendChild(child);
                 }
@@ -218,14 +224,14 @@ public class Json2Xml {
         }      
     }
 
-    private void walkObjectNoXsd(JsonObject jsonNode, Element xmlNode, Document doc) {
+    private void appendChildrenByValue(JsonObject jsonNode, Element xmlNode, Document doc) {
         for (String key : jsonNode.keySet()) {
             JsonElement value = jsonNode.get(key);
             if (value instanceof JsonObject) {
                 JsonObject jo = (JsonObject) value;
                 Element child = createElement(key, doc);
                 if (jo.size() > 0) {
-                    walkObjectNoXsd(jo, child, doc);
+                    appendChildrenByValue(jo, child, doc);
                 }
                 xmlNode.appendChild(child);
             } else if (value instanceof JsonArray) {
@@ -240,12 +246,12 @@ public class Json2Xml {
         }
     }
 
-    private void walkObject(JsonObject jsonNode, Element xmlNode, Document doc, SchemaNode xsdNode) {
+    private void appendChildren(JsonObject jsonNode, Element xmlNode, Document doc, SchemaNode xsdNode) {
         if (xsdNode == null || xsdNode.isAny()) {
-            walkObjectNoXsd(jsonNode, xmlNode, doc);
+            appendChildrenByValue(jsonNode, xmlNode, doc);
         } else {
             for (SchemaNode childXsdNode : xsdNode.getChildren()) {
-                walkObjectByXsd(jsonNode, xmlNode, doc, childXsdNode, false);
+                appendChildrenBySchema(jsonNode, xmlNode, doc, childXsdNode, false);
             }
         }
     }
@@ -266,13 +272,25 @@ public class Json2Xml {
         Element xmlRoot = createElementNS(grammar, grammar.getElementName(), doc);
         doc.appendChild(xmlRoot);
         if (jsonRoot instanceof JsonObject) {
-            walkObject((JsonObject)jsonRoot, xmlRoot, doc, grammar);
-        } else if (jsonRoot instanceof JsonArray) {
-            walkArray(null, (JsonArray) jsonRoot, xmlRoot, doc, grammar, 0);
+            appendChildren((JsonObject)jsonRoot, xmlRoot, doc, grammar);
         } else if (grammar.isSimpleType()) {    // must be a JsonPrimitive or JsonNull
             xmlRoot.setTextContent(jsonRoot.getAsString());
+        } else if (jsonRoot instanceof JsonArray) {
+            JsonArray jsonArray = (JsonArray) jsonRoot;
+            if (jsonArray.size() > 0) {
+                if (grammar.getChildren().size() == 1 && grammar.getChildren().get(0).isIndicator()) {
+                    SchemaNode rootIndicator = grammar.getChildren().get(0);
+                    if (rootIndicator.getMaxOccurs() > 1) {
+                        walkArray(null, jsonArray, xmlRoot, doc, rootIndicator, 0);
+                    } else if (rootIndicator.getChildren().size() == 1 && rootIndicator.getChildren().get(0).getMaxOccurs() > 1) {
+                        walkArray(rootIndicator.getChildren().get(0).getElementName(), jsonArray, xmlRoot, doc, rootIndicator.getChildren().get(0), 0);
+                    } else if (jsonArray.get(0) instanceof JsonObject) {
+                        appendChildren((JsonObject) jsonArray.get(0), xmlRoot, doc, grammar);
+                    }
+                }
+            }
         } else {
-            walkObject(new JsonObject(), xmlRoot, doc, grammar);    // build empty XML
+            appendChildren(new JsonObject(), xmlRoot, doc, grammar);    // build empty XML
         }
         return doc;
     }
@@ -307,9 +325,9 @@ public class Json2Xml {
                 : doc.createElementNS(nameSpaceUri, "pfx:" + rootElemName));
         doc.appendChild(xmlRoot);
         if (jsonRoot instanceof JsonObject) {
-            walkObjectNoXsd((JsonObject)jsonRoot, xmlRoot, doc);
+            appendChildrenByValue((JsonObject)jsonRoot, xmlRoot, doc);
         } else if (jsonRoot instanceof JsonArray) {
-            walkArray(null, (JsonArray) jsonRoot, xmlRoot, doc, null, 0);
+            walkArray("item", (JsonArray) jsonRoot, xmlRoot, doc, null, 0);
         } else {    // must be a JsonPrimitive or JsonNull
             xmlRoot.setTextContent(jsonRoot.getAsString());
         }
