@@ -1,0 +1,10 @@
+{
+	"address": {
+		"city":  "city1",
+		"street":  "street1",
+		"houseNumber": {
+			"_content": 3,
+			"myAttr": "blabla"
+		}
+	}
+}

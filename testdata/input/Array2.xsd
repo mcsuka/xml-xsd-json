@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://dummy" targetNamespace="http://dummy" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="root">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="x"  maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="a" type="xs:string"/>
+							<xs:element name="b" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

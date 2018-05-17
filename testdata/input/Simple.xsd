@@ -24,8 +24,89 @@
 							<xs:element name="info">
 								<xs:complexType mixed="true">
 									<xs:sequence>
-										<xs:any maxOccurs="10" processContents="skip"/>
+										<xs:any processContents="skip" maxOccurs="10"/>
 									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="root4">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="address">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="street" minOccurs="0" type="xs:string"/>
+							<xs:element name="houseNumber" type="xs:int"/>
+							<xs:element name="postCode" type="xs:string"/>
+							<xs:element name="city" minOccurs="0" type="xs:string"/>
+							<xs:element name="municipality">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:boolean">
+											<xs:attribute name="x" use="optional" default="x"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="root5">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="address">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:choice>
+								<xs:element name="postCode" type="xs:string"/>
+								<xs:sequence>
+									<xs:element name="city" minOccurs="0" type="xs:string"/>
+									<xs:element name="street" minOccurs="0" type="xs:string"/>
+								</xs:sequence>
+							</xs:choice>
+							<xs:element name="houseNumber" default="3">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:int">
+											<xs:anyAttribute processContents="skip"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="root6">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="address">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:choice>
+								<xs:element name="postCode" type="xs:string"/>
+								<xs:sequence>
+									<xs:element name="city" minOccurs="0" type="xs:string"/>
+									<xs:element name="street" minOccurs="0" type="xs:string"/>
+								</xs:sequence>
+							</xs:choice>
+							<xs:element name="houseNumber" fixed="7">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:int">
+											<xs:anyAttribute processContents="skip"/>
+										</xs:extension>
+									</xs:simpleContent>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
