@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:root xmlns:ns0="http://dummy">
+   <ns0:x>
+      <ns0:a>1</ns0:a>
+      <ns0:b>2</ns0:b>
+   </ns0:x>
+   <ns0:x>
+      <ns0:a/>
+      <ns0:b/>
+   </ns0:x>
+</ns0:root>

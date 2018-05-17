@@ -5,7 +5,7 @@
       <houseNumber>1</houseNumber>
       <postCode>zip1</postCode>
       <city>cty1</city>
-      <municipality>true</municipality>
+      <municipality myAttr="something">true</municipality>
       <info>
          <field1>some information 1</field1>
          <field2>333</field2>

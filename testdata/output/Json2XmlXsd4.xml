@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:root2 xmlns:ns0="http://dummy.org/1231312">
+   <address>
+      <street/>
+      <houseNumber>0</houseNumber>
+      <postCode>zip1</postCode>
+      <city>cty1</city>
+      <ns0:municipality x="x">false</ns0:municipality>
+   </address>
+</ns0:root2>
