@@ -187,9 +187,9 @@ public class TestJson2Xml {
 
   @Test
   public void testJson2XmlXsdScalar() throws Exception {
-    String actual = json2xmlNs("testdata/input/Scalar.xsd", "root", "testdata/input/Json2XmlXsdScalar.json");
-    String expected = GenericTools.getResourceFile("testdata/output/Json2XmlXsdScalar.xml");
-    GenericTools.assertEquals(expected, actual);
+    String aactual = json2xmlNs("testdata/input/Scalar.xsd", "root", "testdata/input/Json2XmlXsdScalar.json");
+    String eexpected = GenericTools.getResourceFile("testdata/output/Json2XmlXsdScalar.xml");
+    GenericTools.assertEquals(eexpected, aactual);
   }
 
   @Test
