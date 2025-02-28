@@ -30,11 +30,11 @@ public class SchemaParser {
     private final boolean attributeQualified;
 
     private final DocumentSource docSource;
-    private final HashMap<String, String> importMap = new HashMap<String, String>();
-    private final HashMap<String, String> pfxMap = new HashMap<String, String>();
-    private final HashMap<String, Node> typeNodeMap = new HashMap<String, Node>();
-    private final HashMap<String, Node> elemNodeMap = new HashMap<String, Node>();
-    private final HashMap<String, Node> groupNodeMap = new HashMap<String, Node>();
+    private final HashMap<String, String> importMap = new HashMap<>();
+    private final HashMap<String, String> pfxMap = new HashMap<>();
+    private final HashMap<String, Node> typeNodeMap = new HashMap<>();
+    private final HashMap<String, Node> elemNodeMap = new HashMap<>();
+    private final HashMap<String, Node> groupNodeMap = new HashMap<>();
     private final Document input;
 
     private final String targetNamespace;
@@ -65,26 +65,24 @@ public class SchemaParser {
         
         // get name-space prefixes
         HashMap<String, String> attrs = XmlTools.getAttributes(documentNode);
-        if (attrs != null) {
-            for (String attrName : attrs.keySet()) {
-                String attrValue = attrs.get(attrName);
-                if (attrName != null) {
-                    if (attrName.startsWith("xmlns:")) {
-                        pfxMap.put(attrName.substring(6), attrValue);
-                    }
-                    if (attrName.equals("xmlns")) {
-                        pfxMap.put("", attrValue);
-                    }
-                    if (attrName.equals("targetNamespace")) {
-                        myTargetNamespace = attrValue;
-                        pfxMap.put("targetNamespace", attrValue);
-                    }
-                    if (attrName.equals("elementFormDefault") && attrValue.equals("unqualified")) {
-                        myElementQualified = false;
-                    }
-                    if (attrName.equals("attributeFormDefault") && attrValue.equals("qualified")) {
-                        myAttributeQualified = true;
-                    }
+        for (String attrName : attrs.keySet()) {
+            String attrValue = attrs.get(attrName);
+            if (attrName != null) {
+                if (attrName.startsWith("xmlns:")) {
+                    pfxMap.put(attrName.substring(6), attrValue);
+                }
+                if (attrName.equals("xmlns")) {
+                    pfxMap.put("", attrValue);
+                }
+                if (attrName.equals("targetNamespace")) {
+                    myTargetNamespace = attrValue;
+                    pfxMap.put("targetNamespace", attrValue);
+                }
+                if (attrName.equals("elementFormDefault") && attrValue.equals("unqualified")) {
+                    myElementQualified = false;
+                }
+                if (attrName.equals("attributeFormDefault") && attrValue.equals("qualified")) {
+                    myAttributeQualified = true;
                 }
             }
         }
@@ -117,34 +115,22 @@ public class SchemaParser {
         getTypesAndElements(input, xsdLocation);
     }
 
+    private Map<String, Node> mapNodes(Document xsdDoc, String path) throws XPathExpressionException {
+        NodeList nodes = (NodeList) xpath.evaluate(path, xsdDoc, XPathConstants.NODESET);
+        Map<String, Node> map = new HashMap<>();
+        if (nodes != null) {
+            for (int i = 0; i < nodes.getLength(); i++) {
+                map.put(XmlTools.getAttribute(nodes.item(i), "name"), nodes.item(i));
+            }
+        }
+        return map;
+    }
+
     private void getTypesAndElements(Document myInput, String xsdLocation) throws XPathExpressionException, DocumentSourceException {
-        NodeList typeNodes = (NodeList) xpath.evaluate("/xs:schema/xs:complexType", myInput, XPathConstants.NODESET);
-        if (typeNodes != null) {
-            for (int i = 0; i < typeNodes.getLength(); i++) {
-                typeNodeMap.put(XmlTools.getAttribute(typeNodes.item(i), "name"), typeNodes.item(i));
-            }
-        }
-        NodeList simpleTypeNodes = (NodeList) xpath.evaluate("/xs:schema/xs:simpleType", myInput,
-                XPathConstants.NODESET);
-        if (simpleTypeNodes != null) {
-            for (int i = 0; i < simpleTypeNodes.getLength(); i++) {
-                typeNodeMap.put(XmlTools.getAttribute(simpleTypeNodes.item(i), "name"), simpleTypeNodes.item(i));
-            }
-        }
-
-        NodeList elemNodes = (NodeList) xpath.evaluate("/xs:schema/xs:element", myInput, XPathConstants.NODESET);
-        if (elemNodes != null) {
-            for (int i = 0; i < elemNodes.getLength(); i++) {
-                elemNodeMap.put(XmlTools.getAttribute(elemNodes.item(i), "name"), elemNodes.item(i));
-            }
-        }
-
-        NodeList groupNodes = (NodeList) xpath.evaluate("/xs:schema/xs:group", myInput, XPathConstants.NODESET);
-        if (groupNodes != null) {
-            for (int i = 0; i < groupNodes.getLength(); i++) {
-                groupNodeMap.put(XmlTools.getAttribute(groupNodes.item(i), "name"), groupNodes.item(i));
-            }
-        }
+        typeNodeMap.putAll(mapNodes(myInput, "/xs:schema/xs:complexType"));
+        typeNodeMap.putAll(mapNodes(myInput, "/xs:schema/xs:simpleType"));
+        elemNodeMap.putAll(mapNodes(myInput, "/xs:schema/xs:element"));
+        groupNodeMap.putAll(mapNodes(myInput, "/xs:schema/xs:group"));
 
         NodeList includeNodes = (NodeList) xpath.evaluate("/xs:schema/xs:include", myInput, XPathConstants.NODESET);
         if (includeNodes != null) {

@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.StringReader;
+import java.util.Optional;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -23,6 +24,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NamedNodeMap;
@@ -195,23 +197,22 @@ public class XmlTools {
         return doc;
     }
 
-    public static ArrayList<Element> getChildElements(Node n) {
+    @NotNull
+    public static ArrayList<Element> getChildElements(@NotNull Node n) {
         ArrayList<Element> result = new ArrayList<Element>();
 
         NodeList children = n.getChildNodes();
-        if (children != null) {
-            for (int j = 0; j < children.getLength(); j++) {
-                Node child = children.item(j);
-                if (child instanceof Element) {
-                    result.add((Element) child);
-                }
+        for (int j = 0; j < children.getLength(); j++) {
+            Node child = children.item(j);
+            if (child instanceof Element) {
+                result.add((Element) child);
             }
         }
 
         return result;
     }
 
-    public Node getChildNode(String localName, Node node) {
+    public Node getChildNode(String localName, @NotNull Node node) {
         NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
@@ -222,8 +223,9 @@ public class XmlTools {
         return null;
     }
 
-    public static HashMap<String, String> getAttributes(Node n) {
-        HashMap<String, String> result = new HashMap<String, String>();
+    @NotNull
+    public static HashMap<String, String> getAttributes(@NotNull Node n) {
+        HashMap<String, String> result = new HashMap<>();
         NamedNodeMap attrs = n.getAttributes();
         if (attrs != null) {
             for (int i = 0; i < attrs.getLength(); i++) {
@@ -233,7 +235,7 @@ public class XmlTools {
         return result;
     }
 
-    public static String getAttribute(Node n, String name) {
+    public static String getAttribute(@NotNull Node n, String name) {
         NamedNodeMap attrs = n.getAttributes();
         if (attrs != null) {
             Node value = attrs.getNamedItem(name);
@@ -250,20 +252,16 @@ public class XmlTools {
     public static class SimpleNamespaceContext implements javax.xml.namespace.NamespaceContext {
 
         public String getNamespaceURI(String prefix) {
-            if (prefix == null)
-                throw new IllegalArgumentException("Null prefix");
-            else if ("xml".equals(prefix))
-                return XMLConstants.XML_NS_URI;
-            else if ("xmlns".equals(prefix))
-                return XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
-            else if ("xs".equals(prefix) || "xsd".equals(prefix))
-                return XMLConstants.W3C_XML_SCHEMA_NS_URI;
-            else if ("wsdl".equals(prefix))
-                return "http://schemas.xmlsoap.org/wsdl/";
-            else if ("soap".equals(prefix))
-                return "http://schemas.xmlsoap.org/wsdl/soap/";
-            else
-                return "";
+            return switch (prefix) {
+                case null    -> throw new IllegalArgumentException("Null prefix");
+                case "xml"   -> XMLConstants.XML_NS_URI;
+                case "xmlns" -> XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+                case "xs"    -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
+                case "xsd"   -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
+                case "wsdl"  -> "http://schemas.xmlsoap.org/wsdl/";
+                case "soap"  -> "http://schemas.xmlsoap.org/wsdl/soap/";
+                default      -> "";
+            };
         }
 
         /**
@@ -278,8 +276,7 @@ public class XmlTools {
          * Not implemented.
          * This method isn't necessary for XPath processing.
          */
-        @SuppressWarnings("rawtypes")
-        public Iterator getPrefixes(String uri) {
+        public Iterator<String> getPrefixes(String uri) {
             throw new UnsupportedOperationException();
         }
 

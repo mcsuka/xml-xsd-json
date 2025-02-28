@@ -76,16 +76,14 @@ public class WsdlDocumentSource implements DocumentSource {
         if (pfxMap == null) {
             pfxMap = new HashMap<>();
             HashMap<String, String> attrs = XmlTools.getAttributes(wsdlDoc.getDocumentElement());
-            if (attrs != null) {
-                for (String attrName : attrs.keySet()) {
-                    String attrValue = attrs.get(attrName);
-                    if (attrName != null) {
-                        if (attrName.startsWith("xmlns:")) {
-                            pfxMap.put(attrName.substring(6), attrValue);
-                        }
-                        if (attrName.equals("xmlns")) {
-                            pfxMap.put("", attrValue);
-                        }
+            for (String attrName : attrs.keySet()) {
+                String attrValue = attrs.get(attrName);
+                if (attrName != null) {
+                    if (attrName.startsWith("xmlns:")) {
+                        pfxMap.put(attrName.substring(6), attrValue);
+                    }
+                    if (attrName.equals("xmlns")) {
+                        pfxMap.put("", attrValue);
                     }
                 }
             }
