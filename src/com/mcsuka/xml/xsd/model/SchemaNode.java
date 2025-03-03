@@ -39,7 +39,7 @@ public class SchemaNode {
     private final boolean any;
     private final boolean attribute;
     private final boolean qualified;
-    private String defaultValue;
+    private final String defaultValue;
     private String unknownValue;
     private final String fixedValue;
     private final String namespace;
@@ -51,8 +51,8 @@ public class SchemaNode {
     private SchemaNode recursiveParent;
 
     private SchemaNode parent;
-    private HashMap<String, SchemaNode> childMap = new HashMap<>();
-    private List<SchemaNode> children = new ArrayList<>();
+    private final HashMap<String, SchemaNode> childMap = new HashMap<>();
+    private final List<SchemaNode> children = new ArrayList<>();
 
     /**
      * Create an indicator SchemaNode
@@ -270,7 +270,7 @@ public class SchemaNode {
     private void updatePath(String parentPath) {
         this.path = ("".equals(elementName) ? parentPath : parentPath + "/" + elementName);
         for (SchemaNode child : children) {
-            ((SchemaNode) child).updatePath(path);
+            child.updatePath(path);
         }
     }
 
@@ -291,7 +291,7 @@ public class SchemaNode {
     }
 
     public boolean isLeaf() {
-        return (children.size() == 0);
+        return (children.isEmpty());
     }
 
     public boolean isAny() {
@@ -352,41 +352,48 @@ public class SchemaNode {
      * @param w3cTypeName localName of the XSD data type (e.g. nonNegativeInteger, dateTime, string)
      */
     void setW3CType(String w3cTypeName) {
-        if ("byte".equals(w3cTypeName) || "short".equals(w3cTypeName) || "int".equals(w3cTypeName)
-                || "unsignedShort".equals(w3cTypeName) || "unsignedByte".equals(w3cTypeName)) {
-            this.w3cType = DataType.INTEGER;
-            setUnknownValue("0");
-        } else if ("integer".equals(w3cTypeName) || "long".equals(w3cTypeName)
-                || "nonNegativeInteger".equals(w3cTypeName) || "nonPositiveInteger".equals(w3cTypeName)
-                || "unsignedLong".equals(w3cTypeName) || "unsignedInt".equals(w3cTypeName)) {
-            this.w3cType = DataType.LONG;
-            setUnknownValue("0");
-        } else if ("positiveInteger".equals(w3cTypeName)) {
-            this.w3cType = DataType.LONG;
-            setUnknownValue("1");
-        } else if ("negativeInteger".equals(w3cTypeName)) {
-            this.w3cType = DataType.LONG;
-            setUnknownValue("-1");
-        } else if ("decimal".equals(w3cTypeName) || "double".equals(w3cTypeName) || "float".equals(w3cTypeName)) {
-            this.w3cType = DataType.DOUBLE;
-            setUnknownValue("0.0");
-        } else if ("boolean".equals(w3cTypeName)) {
-            this.w3cType = DataType.BOOLEAN;
-            setUnknownValue("false");
-        } else if ("date".equals(w3cTypeName)) {
-            this.w3cType = DataType.DATE;
-            setUnknownValue("2000-01-01");
-        } else if ("dateTime".equals(w3cTypeName)) {
-            this.w3cType = DataType.DATETIME;
-            setUnknownValue("2000-01-01T00:00:00Z");
-        } else if ("time".equals(w3cTypeName)) {
-            this.w3cType = DataType.TIME;
-            setUnknownValue("00:00:00");
-        } else if ("duration".equals(w3cTypeName)) {
-            this.w3cType = DataType.STRING;
-            setUnknownValue("P0S");
-        } else {
-            this.w3cType = DataType.STRING;
+        switch (w3cTypeName) {
+            case "byte", "short", "int", "unsignedShort", "unsignedByte" -> {
+                this.w3cType = DataType.INTEGER;
+                setUnknownValue("0");
+            }
+            case "integer", "long", "nonNegativeInteger", "nonPositiveInteger", "unsignedLong", "unsignedInt" -> {
+                this.w3cType = DataType.LONG;
+                setUnknownValue("0");
+            }
+            case "positiveInteger" -> {
+                this.w3cType = DataType.LONG;
+                setUnknownValue("1");
+            }
+            case "negativeInteger" -> {
+                this.w3cType = DataType.LONG;
+                setUnknownValue("-1");
+            }
+            case "decimal", "double", "float" -> {
+                this.w3cType = DataType.DOUBLE;
+                setUnknownValue("0.0");
+            }
+            case "boolean" -> {
+                this.w3cType = DataType.BOOLEAN;
+                setUnknownValue("false");
+            }
+            case "date" -> {
+                this.w3cType = DataType.DATE;
+                setUnknownValue("2000-01-01");
+            }
+            case "dateTime" -> {
+                this.w3cType = DataType.DATETIME;
+                setUnknownValue("2000-01-01T00:00:00Z");
+            }
+            case "time" -> {
+                this.w3cType = DataType.TIME;
+                setUnknownValue("00:00:00");
+            }
+            case "duration" -> {
+                this.w3cType = DataType.STRING;
+                setUnknownValue("P0S");
+            }
+            case null, default -> this.w3cType = DataType.STRING;
         }
     }
 

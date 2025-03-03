@@ -1,16 +1,16 @@
 package com.mcsuka.xml.xsd.tools;
 
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -18,8 +18,6 @@ import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Load XSDs from the 'schema' sections of a single WSDL file
@@ -31,30 +29,26 @@ public class WsdlDocumentSource implements DocumentSource {
 
     public enum OperationType {
         input, output
-    };
+    }
 
     public WsdlDocumentSource(Document wsdlDoc) {
         this.wsdlDoc = wsdlDoc;
     }
 
-    public WsdlDocumentSource(String wsdlUrl) throws IOException, ParserConfigurationException, SAXException {
-        this(wsdlUrl, "UTF-8");
+    public WsdlDocumentSource(String wsdlUrl) throws Exception {
+        this(wsdlUrl, StandardCharsets.UTF_8);
     }
 
-    public WsdlDocumentSource(String wsdlUrl, String charsetName)
-            throws IOException, ParserConfigurationException, SAXException {
-        InputStreamReader inputStreamReader = null;
+    public WsdlDocumentSource(String wsdlUrl, Charset charset) throws Exception {
         if (wsdlUrl.startsWith("http://") || wsdlUrl.startsWith("https://")) {
-            URL url = new URL(wsdlUrl);
+            URL url = new URI(wsdlUrl).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            inputStreamReader = new InputStreamReader(conn.getInputStream(), charsetName);
+            wsdlDoc = inputStreamToDoc(conn::getInputStream, charset);
         } else {
             String fileName = wsdlUrl.startsWith("file://") ? wsdlUrl.substring(7) : wsdlUrl;
-            inputStreamReader = new InputStreamReader(new FileInputStream(fileName), charsetName);
+            wsdlDoc = inputStreamToDoc(() -> new FileInputStream(fileName), charset);
         }
-        wsdlDoc = XmlTools.getDocumentBuilder().parse(new InputSource(inputStreamReader));
-        inputStreamReader.close();
     }
 
     /**
@@ -95,8 +89,7 @@ public class WsdlDocumentSource implements DocumentSource {
      * Returns the 'schema' element from the WSDL, referenced by its name space
      * URN
      * 
-     * @param nsUrn
-     *            name space URN of the schema inside the WSDL
+     * @param nsUrn name space URN of the schema inside the WSDL
      * @return the schema as a DOM Document
      */
     @Override

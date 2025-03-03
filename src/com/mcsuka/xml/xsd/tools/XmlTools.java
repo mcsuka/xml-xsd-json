@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.StringReader;
-import java.util.Optional;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -39,14 +38,11 @@ import org.xml.sax.SAXException;
  */
 public class XmlTools {
 
-    private static String docBuilderFactoryClass = "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl";
-    private static String xpathFactoryClass = "net.sf.saxon.xpath.XPathFactoryImpl";
-    private static String xpathFactoryUri = XPathFactory.DEFAULT_OBJECT_MODEL_URI;
-    private static String transformerFactoryClass = "net.sf.saxon.TransformerFactoryImpl";
+    private static final String docBuilderFactoryClass = "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl";
 
     private static final SimpleNamespaceContext simpleNamespaceCtx = new SimpleNamespaceContext();
 
-    private static final ThreadLocal<DocumentBuilderFactory> localDocumentBuilderFactory = new ThreadLocal<DocumentBuilderFactory>() {
+    private static final ThreadLocal<DocumentBuilderFactory> localDocumentBuilderFactory = new ThreadLocal<>() {
 
         @Override
         public DocumentBuilderFactory initialValue() {
@@ -62,12 +58,11 @@ public class XmlTools {
 
         @Override
         public DocumentBuilderFactory get() {
-            DocumentBuilderFactory factory = super.get();
-            return factory;
+            return super.get();
         }
     };
 
-    private static final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>() {
+    private static final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<>() {
 
         @Override
         public DocumentBuilder initialValue() {
@@ -89,14 +84,15 @@ public class XmlTools {
         }
     };
 
-    private static final ThreadLocal<XPathFactory> localXPathFactory = new ThreadLocal<XPathFactory>() {
+    private static final ThreadLocal<XPathFactory> localXPathFactory = new ThreadLocal<>() {
 
         @Override
         public XPathFactory initialValue() {
             try {
-                XPathFactory xpathFactory = XPathFactory.newInstance(xpathFactoryUri, xpathFactoryClass,
+                String xpathFactoryClass = "net.sf.saxon.xpath.XPathFactoryImpl";
+                String xpathFactoryUri = XPathFactory.DEFAULT_OBJECT_MODEL_URI;
+                return XPathFactory.newInstance(xpathFactoryUri, xpathFactoryClass,
                         ClassLoader.getSystemClassLoader());
-                return xpathFactory;
             } catch (Exception e) {
                 throw new RuntimeException("Could not create XPathFactory", e);
             }
@@ -104,16 +100,16 @@ public class XmlTools {
 
         @Override
         public XPathFactory get() {
-            XPathFactory xpathFactory = super.get();
-            return xpathFactory;
+            return super.get();
         }
     };
 
-    private static final ThreadLocal<Transformer> localTransformer = new ThreadLocal<Transformer>() {
+    private static final ThreadLocal<Transformer> localTransformer = new ThreadLocal<>() {
 
         @Override
         public Transformer initialValue() {
             try {
+                String transformerFactoryClass = "net.sf.saxon.TransformerFactoryImpl";
                 Transformer transformer = TransformerFactory
                         .newInstance(transformerFactoryClass, ClassLoader.getSystemClassLoader()).newTransformer();
                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -127,19 +123,16 @@ public class XmlTools {
 
         @Override
         public Transformer get() {
-            Transformer transformer = super.get();
-            return transformer;
+            return super.get();
         }
     };
 
     public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
-        DocumentBuilder db = localDocumentBuilderFactory.get().newDocumentBuilder();
-        return db;
+        return localDocumentBuilderFactory.get().newDocumentBuilder();
     }
 
     public static DocumentBuilder getDocumentBuilder() {
-        DocumentBuilder db = localDocumentBuilder.get();
-        return db;
+        return localDocumentBuilder.get();
     }
 
     public static XPathFactory getXPathFactory() {
@@ -190,16 +183,16 @@ public class XmlTools {
         return doc;
     }
 
-    public static Document parseXML(String xml) throws SAXException, IOException {
-        DocumentBuilder domBuilder = getDocumentBuilder();
-        InputSource inputSource = new InputSource(new StringReader(xml));
-        Document doc = domBuilder.parse(inputSource);
-        return doc;
-    }
+//    public static Document parseXML(String xml) throws SAXException, IOException {
+//        DocumentBuilder domBuilder = getDocumentBuilder();
+//        InputSource inputSource = new InputSource(new StringReader(xml));
+//        Document doc = domBuilder.parse(inputSource);
+//        return doc;
+//    }
 
     @NotNull
     public static ArrayList<Element> getChildElements(@NotNull Node n) {
-        ArrayList<Element> result = new ArrayList<Element>();
+        ArrayList<Element> result = new ArrayList<>();
 
         NodeList children = n.getChildNodes();
         for (int j = 0; j < children.getLength(); j++) {
@@ -212,16 +205,16 @@ public class XmlTools {
         return result;
     }
 
-    public Node getChildNode(String localName, @NotNull Node node) {
-        NodeList children = node.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
-            if (localName.equals(child.getLocalName())) {
-                return child;
-            }
-        }
-        return null;
-    }
+//    public static Node getChildNode(String localName, @NotNull Node node) {
+//        NodeList children = node.getChildNodes();
+//        for (int i = 0; i < children.getLength(); i++) {
+//            Node child = children.item(i);
+//            if (localName.equals(child.getLocalName())) {
+//                return child;
+//            }
+//        }
+//        return null;
+//    }
 
     @NotNull
     public static HashMap<String, String> getAttributes(@NotNull Node n) {
@@ -253,14 +246,13 @@ public class XmlTools {
 
         public String getNamespaceURI(String prefix) {
             return switch (prefix) {
-                case null    -> throw new IllegalArgumentException("Null prefix");
-                case "xml"   -> XMLConstants.XML_NS_URI;
-                case "xmlns" -> XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
-                case "xs"    -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
-                case "xsd"   -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
-                case "wsdl"  -> "http://schemas.xmlsoap.org/wsdl/";
-                case "soap"  -> "http://schemas.xmlsoap.org/wsdl/soap/";
-                default      -> "";
+                case null        -> throw new IllegalArgumentException("Null prefix");
+                case "xml"       -> XMLConstants.XML_NS_URI;
+                case "xmlns"     -> XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+                case "xsd", "xs" -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
+                case "wsdl"      -> "http://schemas.xmlsoap.org/wsdl/";
+                case "soap"      -> "http://schemas.xmlsoap.org/wsdl/soap/";
+                default          -> "";
             };
         }
 

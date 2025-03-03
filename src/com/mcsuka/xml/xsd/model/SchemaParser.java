@@ -35,12 +35,11 @@ public class SchemaParser {
     private final HashMap<String, Node> typeNodeMap = new HashMap<>();
     private final HashMap<String, Node> elemNodeMap = new HashMap<>();
     private final HashMap<String, Node> groupNodeMap = new HashMap<>();
-    private final Document input;
 
     private final String targetNamespace;
 
     private final XPath xpath;
-    private final HashMap<String, SchemaNode> modelMap = new HashMap<String, SchemaNode>();
+    private final HashMap<String, SchemaNode> modelMap = new HashMap<>();
 
     /**
      * Constructor should not be called directly, but via the SchemaParserFactory
@@ -52,7 +51,7 @@ public class SchemaParser {
         this.docSource = docSource;
         logXsdLocation = xsdLocation;
 
-        input = docSource.parse(xsdLocation);
+        Document input = docSource.parse(xsdLocation);
         Element documentNode = input.getDocumentElement();
 
         pfxMap.put("xsd", "http://www.w3.org/2001/XMLSchema");
@@ -198,41 +197,36 @@ public class SchemaParser {
     private SchemaNode parseElement(Node xsdNode, SchemaNode parentModelNode, boolean global) throws XPathExpressionException, DocumentSourceException {
         if (xsdNode instanceof Element) {
             HashMap<String, String> attrs = XmlTools.getAttributes(xsdNode);
-            if (attrs != null) {
-                if (attrs.containsKey("name")) {             // element definition
-                    String name = attrs.get("name");
-                    String fixedValue = attrs.get("fixed");
-                    String defaultValue = (fixedValue == null ? attrs.get("default") : fixedValue);
-                    String form = attrs.get("form");
-                    boolean qualified = (form == null ? elementQualified || global : "qualified".equals(form));
-                    SchemaNode thisModelNode = new SchemaNode(name, null, targetNamespace,
-                            qualified, false, false, defaultValue, fixedValue,
-                            formatCardinality(attrs, "minOccurs"), formatCardinality(attrs, "maxOccurs"));
-                    if (parentModelNode != null) {
-                        parentModelNode.addChild(thisModelNode);
-                    }
-                    if (attrs.containsKey("type")) {
-                        applyType(attrs.get("type"), thisModelNode);
-                    } else if (!thisModelNode.isRecursive()) {
-                        appendChildNodes(xsdNode, thisModelNode);
-                    }
-                    thisModelNode.setDocumentation(getDocumentation(xsdNode));
-                    return thisModelNode;
-                } else if (attrs.containsKey("ref")) {      // element reference
-                    String elemRef = attrs.get("ref");
-                    int pos = elemRef.indexOf(":");
-                    String pfx = (pos < 0 ? "" : elemRef.substring(0, pos));
-                    String ns = pfxMap.get(pfx);
-                    String localName = (pos < 0 ? elemRef : elemRef.substring(pos + 1));
-                    SchemaNode refElem = null;
-                    if (ns.equals(targetNamespace)) {
-                        refElem = parseGlobalElement(localName, parentModelNode);
-                    } else {
-                        SchemaParser doc = SchemaParserFactory.newSchemaParser(importMap.get(ns), docSource);
-                        refElem = doc.parseGlobalElement(localName, parentModelNode);
-                    }
-                    return refElem;
+            if (attrs.containsKey("name")) {             // element definition
+                String name = attrs.get("name");
+                String fixedValue = attrs.get("fixed");
+                String defaultValue = (fixedValue == null ? attrs.get("default") : fixedValue);
+                String form = attrs.get("form");
+                boolean qualified = (form == null ? elementQualified || global : "qualified".equals(form));
+                SchemaNode thisModelNode = new SchemaNode(name, null, targetNamespace,
+                        qualified, false, false, defaultValue, fixedValue,
+                        formatCardinality(attrs, "minOccurs"), formatCardinality(attrs, "maxOccurs"));
+                if (parentModelNode != null) {
+                    parentModelNode.addChild(thisModelNode);
                 }
+                if (attrs.containsKey("type")) {
+                    applyType(attrs.get("type"), thisModelNode);
+                } else if (!thisModelNode.isRecursive()) {
+                    appendChildNodes(xsdNode, thisModelNode);
+                }
+                thisModelNode.setDocumentation(getDocumentation(xsdNode));
+                return thisModelNode;
+            } else if (attrs.containsKey("ref")) {      // element reference
+                String elemRef = attrs.get("ref");
+                int pos = elemRef.indexOf(":");
+                String pfx = (pos < 0 ? "" : elemRef.substring(0, pos));
+                String ns = pfxMap.get(pfx);
+                String localName = (pos < 0 ? elemRef : elemRef.substring(pos + 1));
+                return ns.equals(targetNamespace)
+                    ? parseGlobalElement(localName, parentModelNode)
+                    : SchemaParserFactory
+                        .newSchemaParser(importMap.get(ns), docSource)
+                        .parseGlobalElement(localName, parentModelNode);
             }
         }
         return null;
@@ -242,7 +236,7 @@ public class SchemaParser {
         // get children of the element
 
         ArrayList<Element> children = XmlTools.getChildElements(xsdNode);
-        if (children != null && children.size() > 0) {
+        if (!children.isEmpty()) {
             for (Element child : children) {
                 String childName = child.getLocalName();
                 HashMap<String, String> attrs = XmlTools.getAttributes(child);
@@ -314,30 +308,28 @@ public class SchemaParser {
     private void appendAttribute(Node xsdNode, SchemaNode parentModelNode) throws XPathExpressionException, DocumentSourceException {
         if (xsdNode instanceof Element) {
             HashMap<String, String> attrs = XmlTools.getAttributes(xsdNode);
-            if (attrs != null) {
-                if (attrs.containsKey("name")) {
-                    String name = attrs.get("name");
-                    String use = attrs.get("use");
-                    int mio = ("required".equals(use) ? 1 : 0);
-                    int mao = ("prohibited".equals(use) ? 0 : 1);
-                    String defaultValue = null;
-                    String fixedValue = null;
-                    String restrictions = null;
-                    if (attrs.containsKey("default")) {
-                        defaultValue = attrs.get("default");
-                        restrictions = "default value: " + defaultValue;
-                    }
-                    if (attrs.containsKey("fixed")) {
-                        defaultValue = attrs.get("fixed");
-                        fixedValue = defaultValue;
-                        restrictions = "fixed value: " + defaultValue;
-                    }
-                    SchemaNode attributeModelNode = new SchemaNode(name, null, targetNamespace, attributeQualified, true, false,
-                            defaultValue, fixedValue, mio, mao);
-                    attributeModelNode.setRestrictions(restrictions);
-                    parentModelNode.addChild(attributeModelNode);
-                    appendChildNodes(xsdNode, attributeModelNode);
+            if (attrs.containsKey("name")) {
+                String name = attrs.get("name");
+                String use = attrs.get("use");
+                int mio = ("required".equals(use) ? 1 : 0);
+                int mao = ("prohibited".equals(use) ? 0 : 1);
+                String defaultValue = null;
+                String fixedValue = null;
+                String restrictions = null;
+                if (attrs.containsKey("default")) {
+                    defaultValue = attrs.get("default");
+                    restrictions = "default value: " + defaultValue;
                 }
+                if (attrs.containsKey("fixed")) {
+                    defaultValue = attrs.get("fixed");
+                    fixedValue = defaultValue;
+                    restrictions = "fixed value: " + defaultValue;
+                }
+                SchemaNode attributeModelNode = new SchemaNode(name, null, targetNamespace, attributeQualified, true, false,
+                        defaultValue, fixedValue, mio, mao);
+                attributeModelNode.setRestrictions(restrictions);
+                parentModelNode.addChild(attributeModelNode);
+                appendChildNodes(xsdNode, attributeModelNode);
             }
         }
     }

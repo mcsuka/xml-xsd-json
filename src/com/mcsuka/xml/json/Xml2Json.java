@@ -97,7 +97,7 @@ public class Xml2Json {
                 }
                 currentKeyMap.put(childName, walk(new JsonObject(), child, getDescendant(xsdNode, childName)));
             }
-            if (currentKeyMap.size() > 0) {
+            if (!currentKeyMap.isEmpty()) {
                 JsonObject jo = new JsonObject();
                 for (Map.Entry<String, JsonElement> entry: currentKeyMap.entrySet()) {
                     jo.add(entry.getKey(), entry.getValue());
@@ -119,7 +119,7 @@ public class Xml2Json {
             }
         }
         List<Element> nodes = XmlTools.getChildElements(xmlNode);
-        if (nodes.size() > 0) {
+        if (!nodes.isEmpty()) {
             for (Element child : nodes) {
                 String childName = child.getLocalName();
                 
@@ -149,30 +149,15 @@ public class Xml2Json {
             return jsonNode;
         } else {
             String stringValue = xmlNode.getTextContent();
-            JsonElement value = null;
             DataType type = (xsdNode != null ? xsdNode.getW3CType() : DataType.STRING);
-            switch (type) {
-            case INTEGER:
-                value = new JsonPrimitive(Integer.parseInt(stringValue));
-                break;
-            case LONG:
-                value = new JsonPrimitive(Long.parseLong(stringValue));
-                break;
-            case DOUBLE:
-                value = new JsonPrimitive(Double.parseDouble(stringValue));
-                break;
-            case BOOLEAN:
-                value = new JsonPrimitive(Boolean.parseBoolean(stringValue));
-                break;
-            case COMPLEX:
-            case MIXED:
-            case ANY:
-                value = JsonNull.INSTANCE ;
-                break;
-            default:
-                value = new JsonPrimitive(stringValue);
-                break;
-            }
+            JsonElement value = switch (type) {
+                case INTEGER -> new JsonPrimitive(Integer.parseInt(stringValue));
+                case LONG -> new JsonPrimitive(Long.parseLong(stringValue));
+                case DOUBLE -> new JsonPrimitive(Double.parseDouble(stringValue));
+                case BOOLEAN -> new JsonPrimitive(Boolean.parseBoolean(stringValue));
+                case COMPLEX, MIXED, ANY -> JsonNull.INSTANCE;
+                default -> new JsonPrimitive(stringValue);
+            };
             if (jsonNode.size() == 0) {
                 return value;
             } else {
@@ -188,7 +173,7 @@ public class Xml2Json {
      * @param xml XML text
      * @return JSONObject or JSONArray or String (Only text nodes in the XML root
      *         element)
-     * @throws Exception
+     * @throws Exception parsing or translation failed
      */
     public JsonElement translate(String xml) throws Exception {
         DocumentBuilder builder = XmlTools.getDocumentBuilder();
@@ -202,12 +187,11 @@ public class Xml2Json {
      * 
      * @param xmlRoot DOM document root element
      * @return JSONObject or JSONArray or String (Only text nodes in the xmlRoot)
-     * @throws Exception
      */
-    public JsonElement translate(Element xmlRoot) throws Exception {
+    public JsonElement translate(Element xmlRoot) {
         if (grammar != null && grammar.getChildren().size() == 1
-                && grammar.getChildren().get(0).isIndicator()
-                && grammar.getChildren().get(0).getMaxOccurs() > 1) {   // array, forced by XSD
+                && grammar.getChildren().getFirst().isIndicator()
+                && grammar.getChildren().getFirst().getMaxOccurs() > 1) {   // array, forced by XSD
             return walkRootArray(new JsonArray(), xmlRoot, grammar);
         } else if ("true".equals(XmlTools.getAttribute(xmlRoot, FORCE_ARRAY_ATTRIBUTE))) {   // array, forced by special attribute
             return walkRootArray(new JsonArray(), xmlRoot, grammar);

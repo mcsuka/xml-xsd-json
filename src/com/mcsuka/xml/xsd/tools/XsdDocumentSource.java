@@ -8,12 +8,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 public class XsdDocumentSource implements DocumentSource {
 
@@ -29,14 +27,6 @@ public class XsdDocumentSource implements DocumentSource {
         charset = StandardCharsets.UTF_8;
     }
 
-    private Document inputStreamToDoc(Callable<InputStream> streamSupplier) throws Exception  {
-        try (InputStream stream = streamSupplier.call()) {
-            try (InputStreamReader reader = new InputStreamReader(stream, charset)) {
-                return XmlTools.getDocumentBuilder().parse(new InputSource(reader));
-            }
-        }
-    }
-    
     @Override
     public Document parse(String url) throws DocumentSourceException {
         try {
@@ -44,13 +34,13 @@ public class XsdDocumentSource implements DocumentSource {
                 URL myUrl = new URI(url).toURL();
                 HttpURLConnection conn = (HttpURLConnection) myUrl.openConnection();
                 conn.setRequestMethod("GET");
-                return inputStreamToDoc(conn::getInputStream);
+                return inputStreamToDoc(conn::getInputStream, charset);
             } else {
                 String fileName = url.startsWith("file://") ? url.substring(7) : url;
-                return inputStreamToDoc(() -> new FileInputStream(fileName));
+                return inputStreamToDoc(() -> new FileInputStream(fileName), charset);
             }
         } catch (Throwable t) {
-            logger.warn("Error reading XSD from URL" + url, t);
+            logger.warn("Error reading XSD from URL " + url, t);
             throw new DocumentSourceException("Unable to parse XSD on url " + url, t);
         }
     }
