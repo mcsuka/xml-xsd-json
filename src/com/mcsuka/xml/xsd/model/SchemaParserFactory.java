@@ -1,11 +1,14 @@
 package com.mcsuka.xml.xsd.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import javax.xml.xpath.XPathExpressionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.mcsuka.xml.xsd.tools.DocumentSource;
 import com.mcsuka.xml.xsd.tools.DocumentSourceException;
 
@@ -14,8 +17,8 @@ import com.mcsuka.xml.xsd.tools.DocumentSourceException;
  */
 public class SchemaParserFactory {
 
-    private static final Logger logger = Logger.getLogger(SchemaParser.class.getName());
-    private static ConcurrentHashMap<String, SchemaParser> modelCache = new ConcurrentHashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(SchemaParserFactory.class.getName());
+    private static final ConcurrentHashMap<String, SchemaParser> modelCache = new ConcurrentHashMap<>();
 
     /**
      * Create a new SchemaParser or take it from the cache, if it was already initialized. SchemaParsers must be uniquely identified by their xsdLocation.
@@ -30,7 +33,7 @@ public class SchemaParserFactory {
                 return oldModel;
             }
         } else {
-            logger.fine("XSD model found in cache: " + url);
+            logger.debug("XSD model found in cache: " + url);
         }
         return model;
     }
@@ -46,34 +49,37 @@ public class SchemaParserFactory {
      * Replace reverse slash with forward slash. Try to resolve '..' references to named references.
      */
     public static String normalizeUrl(String url) {
-        logger.fine("Received URL: " + url);
+        logger.debug("Received URL: " + url);
         String[] urlParts = url.replace('\\', '/').split("/");
-        ArrayList<String> newUrlParts = new ArrayList<String>();
-        for (String part : urlParts) {
-            if (".".equals(part)) {
-                // do nothing, do not add the part to the URL
-            } else if ("..".equals(part)) {
-                // remove last part
-                int newLen = newUrlParts.size();
-                if (newLen == 0) {
-                    throw new RuntimeException("Unable to normalize the following URL: " + url);
-                }
-                newUrlParts.remove(newLen - 1);
-            } else {
-                newUrlParts.add(part);
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        int idx = 0;
-        for (String part : newUrlParts) {
-            if (idx == 0) {
-                sb.append(part);
-            } else {
-                sb.append("/" + part);
-            }
-            idx++;
-        }
-        return sb.toString();
+        List<String> newUrlParts = Arrays.stream(urlParts)
+                .collect(ArrayList::new,
+                        (c, e) -> {
+                            if (".".equals(e)) {
+                                // do nothing
+                            } else if ("..".equals(e)) {
+                                if (!c.isEmpty()) c.removeLast();
+                            } else {
+                                c.add(e);
+                            }
+                        },
+                        List::addAll
+                );
+//        ArrayList<String> newUrlParts = new ArrayList<>();
+//        for (String part : urlParts) {
+//            if (".".equals(part)) {
+//                // do nothing, do not add the part to the URL
+//            } else if ("..".equals(part)) {
+//                // remove last part
+//                int newLen = newUrlParts.size();
+//                if (newLen == 0) {
+//                    throw new RuntimeException("Unable to normalize the following URL: " + url);
+//                }
+//                newUrlParts.remove(newLen - 1);
+//            } else {
+//                newUrlParts.add(part);
+//            }
+//        }
+        return String.join("/", newUrlParts);
     }
 
 }

@@ -14,7 +14,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 public class GenericTools {
 
@@ -67,7 +67,7 @@ public class GenericTools {
           expected = expected.trim();
           actual = actual.trim();
         }
-        Assert.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, actual);
       }
 
 

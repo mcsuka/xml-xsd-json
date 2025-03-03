@@ -4,11 +4,8 @@ import java.util.List;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.mcsuka.xml.xsd.model.SchemaNode;
-import com.mcsuka.xml.xsd.model.SchemaParser;
-import com.mcsuka.xml.xsd.model.SchemaParserFactory;
 import com.mcsuka.xml.xsd.tools.DocumentSourceException;
 import com.mcsuka.xml.xsd.tools.WsdlDocumentSource;
 import com.mcsuka.xml.xsd.tools.XsdDocumentSource;
@@ -23,7 +20,7 @@ public class TestSchemaParser {
     }
     
     private static void collectResult(SchemaNode n, StringBuilder s) {
-        s.append(n + "\n");
+        s.append(n).append("\n");
         if (!n.isRecursive()) {
             for (SchemaNode c : n.getChildren()) {
                 collectResult(c, s);

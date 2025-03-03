@@ -23,6 +23,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NamedNodeMap;
@@ -37,14 +38,11 @@ import org.xml.sax.SAXException;
  */
 public class XmlTools {
 
-    private static String docBuilderFactoryClass = "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl";
-    private static String xpathFactoryClass = "net.sf.saxon.xpath.XPathFactoryImpl";
-    private static String xpathFactoryUri = XPathFactory.DEFAULT_OBJECT_MODEL_URI;
-    private static String transformerFactoryClass = "net.sf.saxon.TransformerFactoryImpl";
+    private static final String docBuilderFactoryClass = "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl";
 
     private static final SimpleNamespaceContext simpleNamespaceCtx = new SimpleNamespaceContext();
 
-    private static final ThreadLocal<DocumentBuilderFactory> localDocumentBuilderFactory = new ThreadLocal<DocumentBuilderFactory>() {
+    private static final ThreadLocal<DocumentBuilderFactory> localDocumentBuilderFactory = new ThreadLocal<>() {
 
         @Override
         public DocumentBuilderFactory initialValue() {
@@ -60,12 +58,11 @@ public class XmlTools {
 
         @Override
         public DocumentBuilderFactory get() {
-            DocumentBuilderFactory factory = super.get();
-            return factory;
+            return super.get();
         }
     };
 
-    private static final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>() {
+    private static final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<>() {
 
         @Override
         public DocumentBuilder initialValue() {
@@ -87,14 +84,15 @@ public class XmlTools {
         }
     };
 
-    private static final ThreadLocal<XPathFactory> localXPathFactory = new ThreadLocal<XPathFactory>() {
+    private static final ThreadLocal<XPathFactory> localXPathFactory = new ThreadLocal<>() {
 
         @Override
         public XPathFactory initialValue() {
             try {
-                XPathFactory xpathFactory = XPathFactory.newInstance(xpathFactoryUri, xpathFactoryClass,
+                String xpathFactoryClass = "net.sf.saxon.xpath.XPathFactoryImpl";
+                String xpathFactoryUri = XPathFactory.DEFAULT_OBJECT_MODEL_URI;
+                return XPathFactory.newInstance(xpathFactoryUri, xpathFactoryClass,
                         ClassLoader.getSystemClassLoader());
-                return xpathFactory;
             } catch (Exception e) {
                 throw new RuntimeException("Could not create XPathFactory", e);
             }
@@ -102,16 +100,16 @@ public class XmlTools {
 
         @Override
         public XPathFactory get() {
-            XPathFactory xpathFactory = super.get();
-            return xpathFactory;
+            return super.get();
         }
     };
 
-    private static final ThreadLocal<Transformer> localTransformer = new ThreadLocal<Transformer>() {
+    private static final ThreadLocal<Transformer> localTransformer = new ThreadLocal<>() {
 
         @Override
         public Transformer initialValue() {
             try {
+                String transformerFactoryClass = "net.sf.saxon.TransformerFactoryImpl";
                 Transformer transformer = TransformerFactory
                         .newInstance(transformerFactoryClass, ClassLoader.getSystemClassLoader()).newTransformer();
                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -125,19 +123,16 @@ public class XmlTools {
 
         @Override
         public Transformer get() {
-            Transformer transformer = super.get();
-            return transformer;
+            return super.get();
         }
     };
 
     public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
-        DocumentBuilder db = localDocumentBuilderFactory.get().newDocumentBuilder();
-        return db;
+        return localDocumentBuilderFactory.get().newDocumentBuilder();
     }
 
     public static DocumentBuilder getDocumentBuilder() {
-        DocumentBuilder db = localDocumentBuilder.get();
-        return db;
+        return localDocumentBuilder.get();
     }
 
     public static XPathFactory getXPathFactory() {
@@ -188,42 +183,42 @@ public class XmlTools {
         return doc;
     }
 
-    public static Document parseXML(String xml) throws SAXException, IOException {
-        DocumentBuilder domBuilder = getDocumentBuilder();
-        InputSource inputSource = new InputSource(new StringReader(xml));
-        Document doc = domBuilder.parse(inputSource);
-        return doc;
-    }
+//    public static Document parseXML(String xml) throws SAXException, IOException {
+//        DocumentBuilder domBuilder = getDocumentBuilder();
+//        InputSource inputSource = new InputSource(new StringReader(xml));
+//        Document doc = domBuilder.parse(inputSource);
+//        return doc;
+//    }
 
-    public static ArrayList<Element> getChildElements(Node n) {
-        ArrayList<Element> result = new ArrayList<Element>();
+    @NotNull
+    public static ArrayList<Element> getChildElements(@NotNull Node n) {
+        ArrayList<Element> result = new ArrayList<>();
 
         NodeList children = n.getChildNodes();
-        if (children != null) {
-            for (int j = 0; j < children.getLength(); j++) {
-                Node child = children.item(j);
-                if (child instanceof Element) {
-                    result.add((Element) child);
-                }
+        for (int j = 0; j < children.getLength(); j++) {
+            Node child = children.item(j);
+            if (child instanceof Element) {
+                result.add((Element) child);
             }
         }
 
         return result;
     }
 
-    public Node getChildNode(String localName, Node node) {
-        NodeList children = node.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
-            if (localName.equals(child.getLocalName())) {
-                return child;
-            }
-        }
-        return null;
-    }
+//    public static Node getChildNode(String localName, @NotNull Node node) {
+//        NodeList children = node.getChildNodes();
+//        for (int i = 0; i < children.getLength(); i++) {
+//            Node child = children.item(i);
+//            if (localName.equals(child.getLocalName())) {
+//                return child;
+//            }
+//        }
+//        return null;
+//    }
 
-    public static HashMap<String, String> getAttributes(Node n) {
-        HashMap<String, String> result = new HashMap<String, String>();
+    @NotNull
+    public static HashMap<String, String> getAttributes(@NotNull Node n) {
+        HashMap<String, String> result = new HashMap<>();
         NamedNodeMap attrs = n.getAttributes();
         if (attrs != null) {
             for (int i = 0; i < attrs.getLength(); i++) {
@@ -233,7 +228,7 @@ public class XmlTools {
         return result;
     }
 
-    public static String getAttribute(Node n, String name) {
+    public static String getAttribute(@NotNull Node n, String name) {
         NamedNodeMap attrs = n.getAttributes();
         if (attrs != null) {
             Node value = attrs.getNamedItem(name);
@@ -250,20 +245,15 @@ public class XmlTools {
     public static class SimpleNamespaceContext implements javax.xml.namespace.NamespaceContext {
 
         public String getNamespaceURI(String prefix) {
-            if (prefix == null)
-                throw new IllegalArgumentException("Null prefix");
-            else if ("xml".equals(prefix))
-                return XMLConstants.XML_NS_URI;
-            else if ("xmlns".equals(prefix))
-                return XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
-            else if ("xs".equals(prefix) || "xsd".equals(prefix))
-                return XMLConstants.W3C_XML_SCHEMA_NS_URI;
-            else if ("wsdl".equals(prefix))
-                return "http://schemas.xmlsoap.org/wsdl/";
-            else if ("soap".equals(prefix))
-                return "http://schemas.xmlsoap.org/wsdl/soap/";
-            else
-                return "";
+            return switch (prefix) {
+                case null        -> throw new IllegalArgumentException("Null prefix");
+                case "xml"       -> XMLConstants.XML_NS_URI;
+                case "xmlns"     -> XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+                case "xsd", "xs" -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
+                case "wsdl"      -> "http://schemas.xmlsoap.org/wsdl/";
+                case "soap"      -> "http://schemas.xmlsoap.org/wsdl/soap/";
+                default          -> "";
+            };
         }
 
         /**
@@ -278,8 +268,7 @@ public class XmlTools {
          * Not implemented.
          * This method isn't necessary for XPath processing.
          */
-        @SuppressWarnings("rawtypes")
-        public Iterator getPrefixes(String uri) {
+        public Iterator<String> getPrefixes(String uri) {
             throw new UnsupportedOperationException();
         }
 

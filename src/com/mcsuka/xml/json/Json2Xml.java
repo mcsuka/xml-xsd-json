@@ -10,7 +10,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mcsuka.xml.xsd.model.SchemaNode;
-import com.mcsuka.xml.xsd.model.SchemaNode.DataType;
 import com.mcsuka.xml.xsd.tools.XmlTools;
 
 import org.w3c.dom.Attr;
@@ -23,7 +22,7 @@ import org.w3c.dom.Element;
  * whether a JSON element should be translated to an XML attribute or an XML
  * element. XML schema will also force the ordering of elements in the schema
  * sequence and creating mandatory elements. The translation is thread safe,
- * side-effect free, it may be reused in concurrent threads.
+ * side effect free, it may be reused in concurrent threads.
  * 
  *
  */
@@ -95,10 +94,9 @@ public class Json2Xml {
     }
 
     private Element createElementNS(SchemaNode xsdNode, String key, Document doc) {
-        Element e = xsdNode != null && xsdNode.isQualified()
+        return xsdNode != null && xsdNode.isQualified()
                 ? doc.createElementNS(xsdNode.getNamespace(), nsPfxMap.get(xsdNode.getNamespace()) + key)
                         : createElement(key, doc);
-                return e;
     }
 
     private int walkArray(String key, JsonArray jsonArray, Element xmlNode, Document doc, SchemaNode xsdNode,
@@ -148,8 +146,8 @@ public class Json2Xml {
                     }
                 }
             }
-            if (!xmlNode.hasChildNodes() && childXsdNode.getIndicator() == SchemaNode.IndicatorType.choice && childXsdNode.getChildren().size() > 0) {
-                appendChildrenBySchema(jsonNode, xmlNode, doc, childXsdNode.getChildren().get(0), false);
+            if (!xmlNode.hasChildNodes() && childXsdNode.getIndicator() == SchemaNode.IndicatorType.choice && !childXsdNode.getChildren().isEmpty()) {
+                appendChildrenBySchema(jsonNode, xmlNode, doc, childXsdNode.getChildren().getFirst(), false);
             }
         } else if (childXsdNode.isAny()) {
             if (childXsdNode.isAttribute()) {  // any Attribute
@@ -180,8 +178,7 @@ public class Json2Xml {
                         walkArray(key, (JsonArray) value, xmlNode, doc, childXsdNode, 0);
                     } else {
                         Element child = createElementNS(childXsdNode, key, doc);
-                        if (value instanceof JsonObject) {
-                            JsonObject jo = (JsonObject) value;
+                        if (value instanceof JsonObject jo) {
                             if (childXsdNode.isSimpleType()) {
                                 if (childXsdNode.getFixedValue() != null) {
                                     child.setTextContent(childXsdNode.getFixedValue());
@@ -227,8 +224,7 @@ public class Json2Xml {
     private void appendChildrenByValue(JsonObject jsonNode, Element xmlNode, Document doc) {
         for (String key : jsonNode.keySet()) {
             JsonElement value = jsonNode.get(key);
-            if (value instanceof JsonObject) {
-                JsonObject jo = (JsonObject) value;
+            if (value instanceof JsonObject jo) {
                 Element child = createElement(key, doc);
                 if (jo.size() > 0) {
                     appendChildrenByValue(jo, child, doc);
@@ -259,9 +255,8 @@ public class Json2Xml {
     /**
      * Translate JSON to XML with XSD support
      * 
-     * @param json JSON Object
+     * @param jsonRoot JSON Object
      * @return XML representation as DOM Document
-     * @throws Exception
      */
     public Document translate(JsonElement jsonRoot) {
         if (grammar == null) {
@@ -275,15 +270,15 @@ public class Json2Xml {
             appendChildren((JsonObject)jsonRoot, xmlRoot, doc, grammar);
         } else if (grammar.isSimpleType()) {    // must be a JsonPrimitive or JsonNull
             xmlRoot.setTextContent(jsonRoot.getAsString());
-        } else if (jsonRoot instanceof JsonArray) {
-            JsonArray jsonArray = (JsonArray) jsonRoot;
-            if (jsonArray.size() > 0) {
-                if (grammar.getChildren().size() == 1 && grammar.getChildren().get(0).isIndicator()) {
-                    SchemaNode rootIndicator = grammar.getChildren().get(0);
+        } else if (jsonRoot instanceof JsonArray jsonArray) {
+            if (!jsonArray.isEmpty()) {
+                if (grammar.getChildren().size() == 1 && grammar.getChildren().getFirst().isIndicator()) {
+                    SchemaNode rootIndicator = grammar.getChildren().getFirst();
                     if (rootIndicator.getMaxOccurs() > 1) {
                         walkArray(null, jsonArray, xmlRoot, doc, rootIndicator, 0);
-                    } else if (rootIndicator.getChildren().size() == 1 && rootIndicator.getChildren().get(0).getMaxOccurs() > 1) {
-                        walkArray(rootIndicator.getChildren().get(0).getElementName(), jsonArray, xmlRoot, doc, rootIndicator.getChildren().get(0), 0);
+                    } else if (rootIndicator.getChildren().size() == 1 && rootIndicator.getChildren().getFirst().getMaxOccurs() > 1) {
+                        walkArray(rootIndicator.getChildren().getFirst().getElementName(), jsonArray, xmlRoot, doc,
+                                rootIndicator.getChildren().getFirst(), 0);
                     } else if (jsonArray.get(0) instanceof JsonObject) {
                         appendChildren((JsonObject) jsonArray.get(0), xmlRoot, doc, grammar);
                     }
@@ -300,28 +295,25 @@ public class Json2Xml {
      * 
      * @param json JSON text
      * @return XML representation as DOM Document
-     * @throws Exception
      */
-    public Document translate(String json) throws Exception {
-        JsonElement jsonRoot = (new JsonParser()).parse(json);
-        Document doc = translate(jsonRoot);
-        return doc;
+    public Document translate(String json) {
+        JsonElement jsonRoot = JsonParser.parseString(json);
+        return translate(jsonRoot);
     }
 
     /**
      * Translate JSON to XML without XSD
      * 
-     * @param json JSON Object
+     * @param jsonRoot JSON Object
      * @param rootElemName XML root element name
      * @param nameSpaceUri XML root element name space. If null, root element has
      *          no name space.
      * @return XML representation as DOM Document
-     * @throws Exception
      */
     public Document translate(JsonElement jsonRoot, String rootElemName, String nameSpaceUri) {
         DocumentBuilder builder = XmlTools.getDocumentBuilder();
         Document doc = builder.newDocument();
-        Element xmlRoot = (nameSpaceUri == null || nameSpaceUri.length() == 0 ? doc.createElement(rootElemName)
+        Element xmlRoot = (nameSpaceUri == null || nameSpaceUri.isEmpty() ? doc.createElement(rootElemName)
                 : doc.createElementNS(nameSpaceUri, "pfx:" + rootElemName));
         doc.appendChild(xmlRoot);
         if (jsonRoot instanceof JsonObject) {
@@ -342,12 +334,10 @@ public class Json2Xml {
      * @param nameSpaceUri XML root element name space. If null, root element has
      *          no name space.
      * @return XML representation as DOM Document
-     * @throws Exception
      */
-    public Document translate(String json, String rootElemName, String nameSpaceUri) throws Exception {
-        JsonElement jsonRoot = (new JsonParser()).parse(json);
-        Document doc = translate(jsonRoot, rootElemName, nameSpaceUri);
-        return doc;
+    public Document translate(String json, String rootElemName, String nameSpaceUri) {
+        JsonElement jsonRoot = JsonParser.parseString(json);
+        return translate(jsonRoot, rootElemName, nameSpaceUri);
     }
 
 }

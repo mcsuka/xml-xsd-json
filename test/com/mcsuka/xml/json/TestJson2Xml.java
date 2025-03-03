@@ -1,9 +1,8 @@
 package com.mcsuka.xml.json;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
-import com.mcsuka.xml.json.Json2Xml;
 import com.mcsuka.xml.xsd.model.SchemaNode;
 import com.mcsuka.xml.xsd.model.SchemaParser;
 import com.mcsuka.xml.xsd.model.SchemaParserFactory;
