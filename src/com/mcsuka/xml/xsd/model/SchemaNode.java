@@ -1,8 +1,7 @@
 package com.mcsuka.xml.xsd.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A tree of SchemaNodes provides a simplified view of an XmlSchema. Each SchemaNode represents one of the following:
@@ -44,7 +43,7 @@ public class SchemaNode {
     private final String fixedValue;
     private final String namespace;
     private String documentation;
-    private String restrictions;
+    private Map<String,String> restrictions;
     private String customType;
     private DataType w3cType;
     private String path;
@@ -125,12 +124,12 @@ public class SchemaNode {
 
     public String toString() {
         if (indicator != null) {
-            return "SimpleXSDModelNode {" + path + "/, " + indicator + ", " + minOccurs + ".." + maxOccurs + "}";
+            return "XmlSchemaNode {" + path + "/, " + indicator + ", " + minOccurs + ".." + maxOccurs + "}";
         } else {
-            return "SimpleXSDModelNode {" + path + ", " + w3cType + ", " + minOccurs + ".." + maxOccurs
+            return "XmlSchemaNode {" + path + ", " + w3cType + ", " + minOccurs + ".." + maxOccurs
                     + (customType != null ? ", TYPE:" + customType : "") + ", NS:" + namespace
                     + (qualified ? ", QUALIFIED" : ", UNQUALIFIED") + (attribute ? ", ATTR" : "") + (any ? ", ANY" : "")
-                    + ", \"" + restrictions + "\""
+                    + ", \"" + restrictionsToText() + "\""
                     + ", \"" + documentation + "\"" + "}";
         }
     }
@@ -149,19 +148,21 @@ public class SchemaNode {
             sb.append(prefix)
                 .append("[ ")
                 .append(indicator)
-                .append("\t")
+                .append(" ")
                 .append(getCardinality())
                 .append("\n");
         } else {
             sb.append(prefix)
                 .append(attribute ? "@" + elementName : elementName)
-                .append('\t').append(getCardinality())
-                .append('\t').append(w3cType)
-                .append('\t').append(documentation == null ? "" : documentation)
-                .append('\t').append(restrictions == null ? "" : restrictions)
+                .append(' ').append(getCardinality())
+                .append(' ').append(w3cType)
+                .append(' ').append(documentation == null ? "" : documentation)
+                .append(' ').append(restrictions == null ? "" : restrictionsToText())
+                .append(' ').append(fixedValue == null ? "" : "fixedValue=" + fixedValue)
+                .append(' ').append(defaultValue == null ? "" : "defaultValue=" + defaultValue)
                 .append('\n');
-            childPrefix = prefix + "    ";
         }
+        childPrefix = prefix + "  ";
         if (recursiveParent == null) {
             for (SchemaNode child: children) {
                 sb.append(child.dumpTree(childPrefix));
@@ -311,7 +312,12 @@ public class SchemaNode {
     }
 
     public String getOptionalValue() {
-        return defaultValue == null ? unknownValue : defaultValue;
+        if (fixedValue != null)
+            return fixedValue;
+        else if (defaultValue != null)
+            return defaultValue;
+        else
+            return unknownValue;
     }
 
     public String getFixedValue() {
@@ -410,23 +416,26 @@ public class SchemaNode {
         }
     }
 
-    public String getRestrictions() {
+    public Map<String, String> getRestrictions() {
         return restrictions;
     }
 
-    void appendRestrictions(String restrictions) {
-        if (this.restrictions == null) {
-            this.restrictions = restrictions;
-        } else {
-            this.restrictions += restrictions;
-        }
+    public String restrictionsToText() {
+        return restrictions == null
+            ? null
+            : restrictions
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(e -> e.getKey() + ": '" + e.getValue() + "'")
+                .collect(Collectors.joining("; "));
     }
 
-    /**
-     * Set the restrictions description of the element or attribute
-     */
-    void setRestrictions(String restrictions) {
-        this.restrictions = restrictions;
+    void appendRestrictions(String type, String value) {
+        if (this.restrictions == null) {
+            this.restrictions = new HashMap<>();
+        }
+        restrictions.compute(type, (t, v) -> (v == null) ? value : v + "|" + value);
     }
 
     public boolean isSimpleType() {

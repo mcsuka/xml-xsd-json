@@ -104,4 +104,11 @@ public class TestSchemaParser {
         GenericTools.assertEquals("Operation", actual.get(0));
     }
 
+    @Test
+    public void testChoice() throws Exception {
+        SchemaParser model = SchemaParserFactory.newSchemaParser("testdata/input/Choice.xsd", new XsdDocumentSource());
+        SchemaNode n = model.parse("root");
+        System.out.println(n.dumpTree());
+    }
+
 }

@@ -1,11 +1,11 @@
-SimpleXSDModelNode {/root2, COMPLEX, 1..1, TYPE:type_Body_2, NS:http://dummy.org/1231312, QUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root2/, sequence, 1..1}
-SimpleXSDModelNode {/root2/address, COMPLEX, 1..1, TYPE:type_Address, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root2/address/, sequence, 1..1}
-SimpleXSDModelNode {/root2/address/street, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root2/address/houseNumber, INTEGER, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root2/address/postCode, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root2/address/city, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root2/address/municipality, BOOLEAN, 1..1, NS:http://dummy.org/1231312, QUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root2/address/municipality/x, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, ATTR, "fixed value: x", "null"}
-SimpleXSDModelNode {/root2/address/address, COMPLEX, 0..2147483647, TYPE:type_Address, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root2, COMPLEX, 1..1, TYPE:type_Body_2, NS:http://dummy.org/1231312, QUALIFIED, "null", "null"}
+XmlSchemaNode {/root2/, sequence, 1..1}
+XmlSchemaNode {/root2/address, COMPLEX, 1..1, TYPE:type_Address, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root2/address/, sequence, 1..1}
+XmlSchemaNode {/root2/address/street, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root2/address/houseNumber, INTEGER, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root2/address/postCode, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root2/address/city, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root2/address/municipality, BOOLEAN, 1..1, NS:http://dummy.org/1231312, QUALIFIED, "null", "null"}
+XmlSchemaNode {/root2/address/municipality/x, STRING, 1..1, NS:http://dummy.org/1231312, UNQUALIFIED, ATTR, "null", "null"}
+XmlSchemaNode {/root2/address/address, COMPLEX, 0..2147483647, TYPE:type_Address, NS:http://dummy.org/1231312, UNQUALIFIED, "null", "null"}

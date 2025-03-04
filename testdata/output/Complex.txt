@@ -1,22 +1,22 @@
-SimpleXSDModelNode {/root, COMPLEX, 1..1, TYPE:type_Skeleton, NS:http://dummy.org/Complex.xsd, QUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/, sequence, 1..1}
-SimpleXSDModelNode {/root/header, COMPLEX, 1..1, TYPE:type_Header, NS:http://dummy.org/types/Skeleton.xsd, UNQUALIFIED, "null", "Message Header"}
-SimpleXSDModelNode {/root/header/, sequence, 1..1}
-SimpleXSDModelNode {/root/header/messageID, STRING, 1..1, NS:http://dummy.org/types/Header.xsd, UNQUALIFIED, "null", "Unique ID for this message"}
-SimpleXSDModelNode {/root/header/timestamp, DATETIME, 1..1, NS:http://dummy.org/types/Header.xsd, UNQUALIFIED, "null", "The timestamp of each message birth"}
-SimpleXSDModelNode {/root/header/userID, STRING, 0..1, NS:http://dummy.org/types/Header.xsd, UNQUALIFIED, "null", "A valid user"}
-SimpleXSDModelNode {/root/header/priority, INTEGER, 0..1, TYPE:type_Priority, NS:http://dummy.org/types/Header.xsd, UNQUALIFIED, "maxInclusive:10, minInclusive:0", "Message priority"}
-SimpleXSDModelNode {/root/, sequence, 1..1}
-SimpleXSDModelNode {/root/body, COMPLEX, 1..1, TYPE:type_Body, NS:http://dummy.org/Complex.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/body/, sequence, 1..1}
-SimpleXSDModelNode {/root/body/result, COMPLEX, 1..1, TYPE:type_Result, NS:http://dummy.org/Complex.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/body/result/, sequence, 1..1}
-SimpleXSDModelNode {/root/body/result/resultCode, INTEGER, 1..1, NS:http://dummy.org/types/Result.xsd, UNQUALIFIED, "enumeration: '0' '10' '20'", "null"}
-SimpleXSDModelNode {/root/body/result/resultText, STRING, 1..1, NS:http://dummy.org/types/Result.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/body/data, COMPLEX, 0..1, TYPE:type_Data, NS:http://dummy.org/Complex.xsd, UNQUALIFIED, "null", "Some data"}
-SimpleXSDModelNode {/root/body/data/, sequence, 1..1}
-SimpleXSDModelNode {/root/body/data/customerType, STRING, 1..1, NS:http://dummy.org/types/Data.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/body/data/customerId, INTEGER, 1..1, NS:http://dummy.org/types/Data.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/body/data/products, COMPLEX, 0..1, NS:http://dummy.org/types/Data.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/body/data/products/, sequence, 1..1}
-SimpleXSDModelNode {/root/body/data/products/productId, STRING, 1..2147483647, NS:http://dummy.org/types/Data.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root, COMPLEX, 1..1, TYPE:type_Skeleton, NS:http://dummy.org/Complex.xsd, QUALIFIED, "null", "null"}
+XmlSchemaNode {/root/, sequence, 1..1}
+XmlSchemaNode {/root/header, COMPLEX, 1..1, TYPE:type_Header, NS:http://dummy.org/types/Skeleton.xsd, UNQUALIFIED, "null", "Message Header"}
+XmlSchemaNode {/root/header/, sequence, 1..1}
+XmlSchemaNode {/root/header/messageID, STRING, 1..1, NS:http://dummy.org/types/Header.xsd, UNQUALIFIED, "null", "Unique ID for this message"}
+XmlSchemaNode {/root/header/timestamp, DATETIME, 1..1, NS:http://dummy.org/types/Header.xsd, UNQUALIFIED, "null", "The timestamp of each message birth"}
+XmlSchemaNode {/root/header/userID, STRING, 0..1, NS:http://dummy.org/types/Header.xsd, UNQUALIFIED, "null", "A valid user"}
+XmlSchemaNode {/root/header/priority, INTEGER, 0..1, TYPE:type_Priority, NS:http://dummy.org/types/Header.xsd, UNQUALIFIED, "maxInclusive: '10'; minInclusive: '0'", "Message priority"}
+XmlSchemaNode {/root/, sequence, 1..1}
+XmlSchemaNode {/root/body, COMPLEX, 1..1, TYPE:type_Body, NS:http://dummy.org/Complex.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root/body/, sequence, 1..1}
+XmlSchemaNode {/root/body/result, COMPLEX, 1..1, TYPE:type_Result, NS:http://dummy.org/Complex.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root/body/result/, sequence, 1..1}
+XmlSchemaNode {/root/body/result/resultCode, INTEGER, 1..1, NS:http://dummy.org/types/Result.xsd, UNQUALIFIED, "enumeration: '0|10|20'", "null"}
+XmlSchemaNode {/root/body/result/resultText, STRING, 1..1, NS:http://dummy.org/types/Result.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root/body/data, COMPLEX, 0..1, TYPE:type_Data, NS:http://dummy.org/Complex.xsd, UNQUALIFIED, "null", "Some data"}
+XmlSchemaNode {/root/body/data/, sequence, 1..1}
+XmlSchemaNode {/root/body/data/customerType, STRING, 1..1, NS:http://dummy.org/types/Data.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root/body/data/customerId, INTEGER, 1..1, NS:http://dummy.org/types/Data.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root/body/data/products, COMPLEX, 0..1, NS:http://dummy.org/types/Data.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/root/body/data/products/, sequence, 1..1}
+XmlSchemaNode {/root/body/data/products/productId, STRING, 1..2147483647, NS:http://dummy.org/types/Data.xsd, UNQUALIFIED, "null", "null"}
