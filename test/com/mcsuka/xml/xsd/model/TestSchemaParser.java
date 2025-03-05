@@ -106,9 +106,9 @@ public class TestSchemaParser {
 
     @Test
     public void testChoice() throws Exception {
-        SchemaParser model = SchemaParserFactory.newSchemaParser("testdata/input/Choice.xsd", new XsdDocumentSource());
-        SchemaNode n = model.parse("root");
-        System.out.println(n.dumpTree());
+        String actual = parseXsdFile("testdata/input/Choice.xsd", "root");
+        String expected = GenericTools.getResourceFile("testdata/output/Choice.txt");
+        GenericTools.assertEquals(expected, actual);
     }
 
 }

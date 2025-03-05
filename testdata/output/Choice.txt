@@ -1,0 +1,8 @@
+XmlSchemaNode {/root, COMPLEX, 1..1, NS:http://dummy, QUALIFIED, "null", "Comment describing your root element"}
+XmlSchemaNode {/root/, sequence, 1..2147483647}
+XmlSchemaNode {/root/, choice, 1..1}
+XmlSchemaNode {/root/aEnum, STRING, 1..1, NS:http://dummy, QUALIFIED, "enumeration: 'X|Y|Z'", "null"}
+XmlSchemaNode {/root/aRegex, STRING, 1..1, NS:http://dummy, QUALIFIED, "pattern: '[1-5][0-9]{3}'", "null"}
+XmlSchemaNode {/root/, choice, 1..1}
+XmlSchemaNode {/root/b1, LONG, 1..9, NS:http://dummy, QUALIFIED, "null", "null"}
+XmlSchemaNode {/root/b2, LONG, 1..9, NS:http://dummy, QUALIFIED, "null", "null"}

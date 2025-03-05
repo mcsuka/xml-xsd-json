@@ -30,6 +30,8 @@ public class SchemaNode {
     public enum IndicatorType {
         sequence, all, choice
     }
+
+    private final static Map<String, String> immutableEmptyMap = Collections.emptyMap();
     
     private final String elementName;
     private final IndicatorType indicator;
@@ -126,7 +128,7 @@ public class SchemaNode {
         if (indicator != null) {
             return "XmlSchemaNode {" + path + "/, " + indicator + ", " + minOccurs + ".." + maxOccurs + "}";
         } else {
-            return "XmlSchemaNode {" + path + ", " + w3cType + ", " + minOccurs + ".." + maxOccurs
+            return "XmlSchemaNode {" + elementName + ", "  + path + ", " + w3cType + ", " + minOccurs + ".." + maxOccurs
                     + (customType != null ? ", TYPE:" + customType : "") + ", NS:" + namespace
                     + (qualified ? ", QUALIFIED" : ", UNQUALIFIED") + (attribute ? ", ATTR" : "") + (any ? ", ANY" : "")
                     + ", \"" + restrictionsToText() + "\""
@@ -417,7 +419,7 @@ public class SchemaNode {
     }
 
     public Map<String, String> getRestrictions() {
-        return restrictions;
+        return restrictions == null ? immutableEmptyMap : Collections.unmodifiableMap(restrictions);
     }
 
     public String restrictionsToText() {
