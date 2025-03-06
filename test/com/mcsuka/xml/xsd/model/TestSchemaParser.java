@@ -104,4 +104,11 @@ public class TestSchemaParser {
         GenericTools.assertEquals("Operation", actual.get(0));
     }
 
+    @Test
+    public void testChoice() throws Exception {
+        String actual = parseXsdFile("testdata/input/Choice.xsd", "root");
+        String expected = GenericTools.getResourceFile("testdata/output/Choice.txt");
+        GenericTools.assertEquals(expected, actual);
+    }
+
 }

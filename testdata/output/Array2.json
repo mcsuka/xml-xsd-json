@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "description": "Comment describing your root element",
+  "properties": {
+    "x": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "a": {
+            "type": "string"
+          },
+          "b": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "x"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://dummy?root"
+}

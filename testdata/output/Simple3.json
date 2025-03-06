@@ -1,0 +1,73 @@
+{
+  "type": "object",
+  "properties": {
+    "address": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string"
+          },
+          "houseNumber": {
+            "type": "integer"
+          },
+          "postCode": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "municipality": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "*": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "info": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "*": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 10
+              }
+            },
+            "required": [
+              "*"
+            ]
+          }
+        },
+        "required": [
+          "street",
+          "houseNumber",
+          "postCode",
+          "city",
+          "municipality",
+          "info"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 2
+    }
+  },
+  "required": [
+    "address"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://dummy.org/1231312?root3"
+}

@@ -1,24 +1,24 @@
-SimpleXSDModelNode {/RequestMessage, COMPLEX, 1..1, TYPE:type_MessageSkeleton_2, NS:http://dummy.net/RequestMessage.xsd, QUALIFIED, "null", "null"}
-SimpleXSDModelNode {/RequestMessage/, sequence, 1..1}
-SimpleXSDModelNode {/RequestMessage/header, COMPLEX, 1..1, TYPE:type_MessageHeader, NS:http://dummy.net/types/type_MessageSkeleton_2.xsd, UNQUALIFIED, "null", "Message Header"}
-SimpleXSDModelNode {/RequestMessage/header/, sequence, 1..1}
-SimpleXSDModelNode {/RequestMessage/header/messageID, STRING, 1..1, NS:http://dummy.net/types/type_MessageHeader.xsd, UNQUALIFIED, "null", "Unique ID"}
-SimpleXSDModelNode {/RequestMessage/header/timestamp, DATETIME, 1..1, TYPE:type_DateTimeWithTimezone, NS:http://dummy.net/types/type_MessageHeader.xsd, UNQUALIFIED, "pattern: '.+T.+(Z|[+\-].+)'", "The timestamp of each message birth"}
-SimpleXSDModelNode {/RequestMessage/header/userID, STRING, 0..1, NS:http://dummy.net/types/type_MessageHeader.xsd, UNQUALIFIED, "null", "Unique user identifier"}
-SimpleXSDModelNode {/RequestMessage/header/priority, INTEGER, 0..1, TYPE:type_Priority, NS:http://dummy.net/types/type_MessageHeader.xsd, UNQUALIFIED, "maxInclusive:10, minInclusive:0", "Message priority (not used at the moment)"}
-SimpleXSDModelNode {/RequestMessage/, sequence, 1..1}
-SimpleXSDModelNode {/RequestMessage/body, COMPLEX, 1..1, TYPE:type_Body, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/RequestMessage/body/, sequence, 1..1}
-SimpleXSDModelNode {/RequestMessage/body/contract, COMPLEX, 1..1, TYPE:type_Contract, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "Base abstract Contract Class"}
-SimpleXSDModelNode {/RequestMessage/body/contract/, sequence, 1..1}
-SimpleXSDModelNode {/RequestMessage/body/contract/contractID, STRING, 1..1, TYPE:type_ContractID, NS:http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd, UNQUALIFIED, "pattern: '\d{10,19}'", "null"}
-SimpleXSDModelNode {/RequestMessage/body/contract/customerCode, STRING, 1..1, TYPE:type_CustomerCode, NS:http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd, UNQUALIFIED, "maxLength:24, pattern: '[0-9\.]+'", "null"}
-SimpleXSDModelNode {/RequestMessage/body/cards, COMPLEX, 0..1, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "Related contracts"}
-SimpleXSDModelNode {/RequestMessage/body/cards/, sequence, 1..1}
-SimpleXSDModelNode {/RequestMessage/body/cards/card, COMPLEX, 1..2147483647, TYPE:type_Contract, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "Identifies the contract"}
-SimpleXSDModelNode {/RequestMessage/body/cards/card/, sequence, 1..1}
-SimpleXSDModelNode {/RequestMessage/body/cards/card/contractID, STRING, 1..1, TYPE:type_ContractID, NS:http://dummy.net/types/type_ContractReference.xsd, UNQUALIFIED, "pattern: '\d{10,19}'", "null"}
-SimpleXSDModelNode {/RequestMessage/body/reason, COMPLEX, 1..1, TYPE:type_Reason, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/RequestMessage/body/reason/, sequence, 1..1}
-SimpleXSDModelNode {/RequestMessage/body/reason/code, STRING, 1..1, NS:http://dummy.net/types/type_Reason.xsd, UNQUALIFIED, "null", "null"}
-SimpleXSDModelNode {/RequestMessage/body/reason/description, STRING, 1..1, NS:http://dummy.net/types/type_Reason.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/RequestMessage, COMPLEX, 1..1, TYPE:type_MessageSkeleton_2, NS:http://dummy.net/RequestMessage.xsd, QUALIFIED, "null", "null"}
+XmlSchemaNode {/RequestMessage/, sequence, 1..1}
+XmlSchemaNode {/RequestMessage/header, COMPLEX, 1..1, TYPE:type_MessageHeader, NS:http://dummy.net/types/type_MessageSkeleton_2.xsd, UNQUALIFIED, "null", "Message Header"}
+XmlSchemaNode {/RequestMessage/header/, sequence, 1..1}
+XmlSchemaNode {/RequestMessage/header/messageID, STRING, 1..1, NS:http://dummy.net/types/type_MessageHeader.xsd, UNQUALIFIED, "null", "Unique ID"}
+XmlSchemaNode {/RequestMessage/header/timestamp, DATETIME, 1..1, TYPE:type_DateTimeWithTimezone, NS:http://dummy.net/types/type_MessageHeader.xsd, UNQUALIFIED, "pattern: '.+T.+(Z|[+\-].+)'", "The timestamp of each message birth"}
+XmlSchemaNode {/RequestMessage/header/userID, STRING, 0..1, NS:http://dummy.net/types/type_MessageHeader.xsd, UNQUALIFIED, "null", "Unique user identifier"}
+XmlSchemaNode {/RequestMessage/header/priority, INTEGER, 0..1, TYPE:type_Priority, NS:http://dummy.net/types/type_MessageHeader.xsd, UNQUALIFIED, "maxInclusive: '10'; minInclusive: '0'", "Message priority (not used at the moment)"}
+XmlSchemaNode {/RequestMessage/, sequence, 1..1}
+XmlSchemaNode {/RequestMessage/body, COMPLEX, 1..1, TYPE:type_Body, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/RequestMessage/body/, sequence, 1..1}
+XmlSchemaNode {/RequestMessage/body/contract, COMPLEX, 1..1, TYPE:type_Contract, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "Base abstract Contract Class"}
+XmlSchemaNode {/RequestMessage/body/contract/, sequence, 1..1}
+XmlSchemaNode {/RequestMessage/body/contract/contractID, STRING, 1..1, TYPE:type_ContractID, NS:http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd, UNQUALIFIED, "pattern: '\d{10,19}'", "null"}
+XmlSchemaNode {/RequestMessage/body/contract/customerCode, STRING, 1..1, TYPE:type_CustomerCode, NS:http://dummy.net/types/type_ContractReferenceAndCustomerCode.xsd, UNQUALIFIED, "maxLength: '24'; pattern: '[0-9\.]+'", "null"}
+XmlSchemaNode {/RequestMessage/body/cards, COMPLEX, 0..1, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "Related contracts"}
+XmlSchemaNode {/RequestMessage/body/cards/, sequence, 1..1}
+XmlSchemaNode {/RequestMessage/body/cards/card, COMPLEX, 1..2147483647, TYPE:type_Contract, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "Identifies the contract"}
+XmlSchemaNode {/RequestMessage/body/cards/card/, sequence, 1..1}
+XmlSchemaNode {/RequestMessage/body/cards/card/contractID, STRING, 1..1, TYPE:type_ContractID, NS:http://dummy.net/types/type_ContractReference.xsd, UNQUALIFIED, "pattern: '\d{10,19}'", "null"}
+XmlSchemaNode {/RequestMessage/body/reason, COMPLEX, 1..1, TYPE:type_Reason, NS:http://dummy.net/RequestMessage.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/RequestMessage/body/reason/, sequence, 1..1}
+XmlSchemaNode {/RequestMessage/body/reason/code, STRING, 1..1, NS:http://dummy.net/types/type_Reason.xsd, UNQUALIFIED, "null", "null"}
+XmlSchemaNode {/RequestMessage/body/reason/description, STRING, 1..1, NS:http://dummy.net/types/type_Reason.xsd, UNQUALIFIED, "null", "null"}

@@ -1,7 +1,7 @@
-SimpleXSDModelNode {/root, COMPLEX, 1..1, NS:http://dummy, QUALIFIED, "null", "Comment describing your root element"}
-SimpleXSDModelNode {/root/, sequence, 1..2147483647}
-SimpleXSDModelNode {/root/pre, STRING, 1..1, NS:http://dummy, QUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/, sequence, 1..1}
-SimpleXSDModelNode {/root/a, STRING, 1..1, NS:http://dummy, QUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/b, STRING, 1..1, NS:http://dummy, QUALIFIED, "null", "null"}
-SimpleXSDModelNode {/root/post, STRING, 1..1, NS:http://dummy, QUALIFIED, "null", "null"}
+XmlSchemaNode {/root, COMPLEX, 1..1, NS:http://dummy, QUALIFIED, "null", "Comment describing your root element"}
+XmlSchemaNode {/root/, sequence, 1..2147483647}
+XmlSchemaNode {/root/pre, STRING, 1..1, NS:http://dummy, QUALIFIED, "null", "null"}
+XmlSchemaNode {/root/, sequence, 1..1}
+XmlSchemaNode {/root/a, STRING, 1..1, NS:http://dummy, QUALIFIED, "null", "null"}
+XmlSchemaNode {/root/b, STRING, 1..1, NS:http://dummy, QUALIFIED, "null", "null"}
+XmlSchemaNode {/root/post, STRING, 1..1, NS:http://dummy, QUALIFIED, "null", "null"}

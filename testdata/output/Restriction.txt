@@ -1,4 +1,4 @@
-SimpleXSDModelNode {/root, COMPLEX, 1..1, NS:http://dummy, QUALIFIED, "null", "Comment describing your root element"}
-SimpleXSDModelNode {/root/, sequence, 1..2147483647}
-SimpleXSDModelNode {/root/a, STRING, 1..1, NS:http://dummy, QUALIFIED, "enumeration: 'X' 'Y' 'Z'", "null"}
-SimpleXSDModelNode {/root/b, STRING, 1..1, NS:http://dummy, QUALIFIED, "pattern: '[1-5][0-9]{3}'", "null"}
+XmlSchemaNode {/root, COMPLEX, 1..1, NS:http://dummy, QUALIFIED, "null", "Comment describing your root element"}
+XmlSchemaNode {/root/, sequence, 1..2147483647}
+XmlSchemaNode {/root/a, STRING, 1..1, NS:http://dummy, QUALIFIED, "enumeration: 'X|Y|Z'", "null"}
+XmlSchemaNode {/root/b, STRING, 1..1, NS:http://dummy, QUALIFIED, "pattern: '[1-5][0-9]{3}'", "null"}

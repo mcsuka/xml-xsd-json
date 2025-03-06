@@ -18,6 +18,8 @@ import com.mcsuka.xml.xsd.tools.XmlTools;
 
 import org.w3c.dom.Document;
 
+import static com.mcsuka.xml.xsd.model.SchemaNode.UNBOUNDED_VALUE;
+
 /**
  * The SchemaParser takes an XSD file as an input and creates a tree of SchemaNode objects.
  * XSD references are honored, includes and imports are loaded and a new SchemaParser is initialized for each import. SchemaParser
@@ -200,7 +202,7 @@ public class SchemaParser {
             if (attrs.containsKey("name")) {             // element definition
                 String name = attrs.get("name");
                 String fixedValue = attrs.get("fixed");
-                String defaultValue = (fixedValue == null ? attrs.get("default") : fixedValue);
+                String defaultValue = attrs.get("default");
                 String form = attrs.get("form");
                 boolean qualified = (form == null ? elementQualified || global : "qualified".equals(form));
                 SchemaNode thisModelNode = new SchemaNode(name, null, targetNamespace,
@@ -244,21 +246,9 @@ public class SchemaParser {
                 if ("restriction".equals(childName)) {
                     applyType(attrs.get("base"), modelNode);
                     ArrayList<Element> restrictionList = XmlTools.getChildElements(child);
-                    String prevNodeName = null;
                     for (Element element: restrictionList) {
                         String nodeName = element.getLocalName();
-                        if (!nodeName.equals(prevNodeName)) {
-                            if (modelNode.getRestrictions() != null) {
-                                modelNode.appendRestrictions(", ");
-                            }
-                            modelNode.appendRestrictions(nodeName + ":");
-                        } 
-                        if ("pattern".equals(nodeName) || "enumeration".equals(nodeName)) {
-                            modelNode.appendRestrictions(" '" + XmlTools.getAttribute(element, "value") + "'");
-                        } else {
-                            modelNode.appendRestrictions(XmlTools.getAttribute(element, "value"));
-                        }
-                        prevNodeName = nodeName;
+                        modelNode.appendRestrictions(nodeName, XmlTools.getAttribute(element, "value"));
                     }
                 } else if ("extension".equals(childName)) {
                     applyType(attrs.get("base"), modelNode);
@@ -275,7 +265,7 @@ public class SchemaParser {
                         modelNode.setMixed();
                     }
                 } else if ("anyAttribute".equals(childName)) {
-                    modelNode.addChild(new SchemaNode("*", targetNamespace, attributeQualified, true, true, 0, Integer.MAX_VALUE));
+                    modelNode.addChild(new SchemaNode("*", targetNamespace, attributeQualified, true, true, 0, UNBOUNDED_VALUE));
                 }
             }
         }
@@ -313,21 +303,10 @@ public class SchemaParser {
                 String use = attrs.get("use");
                 int mio = ("required".equals(use) ? 1 : 0);
                 int mao = ("prohibited".equals(use) ? 0 : 1);
-                String defaultValue = null;
-                String fixedValue = null;
-                String restrictions = null;
-                if (attrs.containsKey("default")) {
-                    defaultValue = attrs.get("default");
-                    restrictions = "default value: " + defaultValue;
-                }
-                if (attrs.containsKey("fixed")) {
-                    defaultValue = attrs.get("fixed");
-                    fixedValue = defaultValue;
-                    restrictions = "fixed value: " + defaultValue;
-                }
+                String defaultValue = attrs.get("default");
+                String fixedValue = attrs.get("fixed");
                 SchemaNode attributeModelNode = new SchemaNode(name, null, targetNamespace, attributeQualified, true, false,
                         defaultValue, fixedValue, mio, mao);
-                attributeModelNode.setRestrictions(restrictions);
                 parentModelNode.addChild(attributeModelNode);
                 appendChildNodes(xsdNode, attributeModelNode);
             }
@@ -387,7 +366,7 @@ public class SchemaParser {
             return 1;
         }
         if (xOccurs.equals("unbounded")) {
-            return Integer.MAX_VALUE;
+            return UNBOUNDED_VALUE;
         }
         return Integer.parseInt(xOccurs);
     }

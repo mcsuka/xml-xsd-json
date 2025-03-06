@@ -1,0 +1,29 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "pre": {
+        "type": "string"
+      },
+      "a": {
+        "type": "string"
+      },
+      "b": {
+        "type": "string"
+      },
+      "post": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "pre",
+      "a",
+      "b",
+      "post"
+    ]
+  },
+  "minItems": 1,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://dummy?root"
+}

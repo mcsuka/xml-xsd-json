@@ -158,7 +158,7 @@ public class Xml2Json {
                 case COMPLEX, MIXED, ANY -> JsonNull.INSTANCE;
                 default -> new JsonPrimitive(stringValue);
             };
-            if (jsonNode.size() == 0) {
+            if (jsonNode.isEmpty()) {
                 return value;
             } else {
                 jsonNode.add(XML_ELEMENT_CONTENT, value);
