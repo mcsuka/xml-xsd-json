@@ -1,0 +1,90 @@
+{
+  "type": "object",
+  "properties": {
+    "header": {
+      "type": "object",
+      "description": "Message Header",
+      "properties": {
+        "messageID": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userID": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        }
+      },
+      "required": [
+        "messageID",
+        "timestamp"
+      ]
+    },
+    "body": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "object",
+          "properties": {
+            "resultCode": {
+              "type": "integer"
+            },
+            "resultText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "resultCode",
+            "resultText"
+          ]
+        },
+        "data": {
+          "type": "object",
+          "description": "Some data",
+          "properties": {
+            "customerType": {
+              "type": "string"
+            },
+            "customerId": {
+              "type": "integer"
+            },
+            "products": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "productId"
+              ]
+            }
+          },
+          "required": [
+            "customerType",
+            "customerId"
+          ]
+        }
+      },
+      "required": [
+        "result"
+      ]
+    }
+  },
+  "required": [
+    "header",
+    "body"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://dummy.org/Complex.xsd?root"
+}

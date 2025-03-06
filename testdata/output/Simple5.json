@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "properties": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "postCode": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "houseNumber": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "integer",
+              "default": "3"
+            },
+            "*": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "houseNumber"
+      ]
+    }
+  },
+  "required": [
+    "address"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://dummy.org/1231312?root5"
+}

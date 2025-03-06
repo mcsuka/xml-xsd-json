@@ -1,0 +1,56 @@
+{
+  "type": "object",
+  "description": "Comment describing your root element",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "aEnum": {
+          "type": "string",
+          "enum": [
+            "X",
+            "Y",
+            "Z"
+          ]
+        },
+        "aRegex": {
+          "type": "string",
+          "pattern": "[1-5][0-9]{3}"
+        }
+      },
+      "required": [
+        "aEnum",
+        "aRegex"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "b1": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "default": "1"
+          },
+          "minItems": 1,
+          "maxItems": 9
+        },
+        "b2": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "const": "99"
+          },
+          "minItems": 1,
+          "maxItems": 9
+        }
+      },
+      "required": [
+        "b1",
+        "b2"
+      ]
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://dummy.com?root"
+}

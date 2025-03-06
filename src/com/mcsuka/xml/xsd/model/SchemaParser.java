@@ -18,6 +18,8 @@ import com.mcsuka.xml.xsd.tools.XmlTools;
 
 import org.w3c.dom.Document;
 
+import static com.mcsuka.xml.xsd.model.SchemaNode.UNBOUNDED_VALUE;
+
 /**
  * The SchemaParser takes an XSD file as an input and creates a tree of SchemaNode objects.
  * XSD references are honored, includes and imports are loaded and a new SchemaParser is initialized for each import. SchemaParser
@@ -263,7 +265,7 @@ public class SchemaParser {
                         modelNode.setMixed();
                     }
                 } else if ("anyAttribute".equals(childName)) {
-                    modelNode.addChild(new SchemaNode("*", targetNamespace, attributeQualified, true, true, 0, Integer.MAX_VALUE));
+                    modelNode.addChild(new SchemaNode("*", targetNamespace, attributeQualified, true, true, 0, UNBOUNDED_VALUE));
                 }
             }
         }
@@ -364,7 +366,7 @@ public class SchemaParser {
             return 1;
         }
         if (xOccurs.equals("unbounded")) {
-            return Integer.MAX_VALUE;
+            return UNBOUNDED_VALUE;
         }
         return Integer.parseInt(xOccurs);
     }

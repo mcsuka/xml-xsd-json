@@ -31,6 +31,8 @@ public class SchemaNode {
         sequence, all, choice
     }
 
+    public final static int UNBOUNDED_VALUE = Integer.MAX_VALUE;
+
     private final static Map<String, String> immutableEmptyMap = Collections.emptyMap();
     
     private final String elementName;
@@ -128,7 +130,7 @@ public class SchemaNode {
         if (indicator != null) {
             return "XmlSchemaNode {" + path + "/, " + indicator + ", " + minOccurs + ".." + maxOccurs + "}";
         } else {
-            return "XmlSchemaNode {" + elementName + ", "  + path + ", " + w3cType + ", " + minOccurs + ".." + maxOccurs
+            return "XmlSchemaNode {" + path + ", " + w3cType + ", " + minOccurs + ".." + maxOccurs
                     + (customType != null ? ", TYPE:" + customType : "") + ", NS:" + namespace
                     + (qualified ? ", QUALIFIED" : ", UNQUALIFIED") + (attribute ? ", ATTR" : "") + (any ? ", ANY" : "")
                     + ", \"" + restrictionsToText() + "\""
@@ -144,7 +146,7 @@ public class SchemaNode {
     }
     
     private String dumpTree(String prefix) {
-        String childPrefix = prefix;
+        String childPrefix = prefix + "  ";
         StringBuilder sb = new StringBuilder();
         if(isIndicator()) {
             sb.append(prefix)
@@ -164,7 +166,6 @@ public class SchemaNode {
                 .append(' ').append(defaultValue == null ? "" : "defaultValue=" + defaultValue)
                 .append('\n');
         }
-        childPrefix = prefix + "  ";
         if (recursiveParent == null) {
             for (SchemaNode child: children) {
                 sb.append(child.dumpTree(childPrefix));
@@ -229,7 +230,7 @@ public class SchemaNode {
         }
     }
     
-    public SchemaNode getChild(String childName, boolean skipIndicators) {
+    public SchemaNode getChild(String childName) {
         if (recursiveParent != null) {
             return recursiveParent.getChild(childName);
         } else {
@@ -247,10 +248,6 @@ public class SchemaNode {
                 return null;
             }
         }
-    }
-
-    public SchemaNode getChild(String childName) {
-        return getChild(childName, true);
     }
 
     public String getPath() {
@@ -448,7 +445,7 @@ public class SchemaNode {
      * Convenience method to get a textual representation of the cardinality (e.g. 1, 1..n, 0..3)
      */
     public String getCardinality() {
-        String mo = (maxOccurs == Integer.MAX_VALUE ? "n" : "" + maxOccurs);
+        String mo = (maxOccurs == UNBOUNDED_VALUE ? "n" : "" + maxOccurs);
         return minOccurs + (maxOccurs > minOccurs ? ".." + mo : "");
     }
 }
