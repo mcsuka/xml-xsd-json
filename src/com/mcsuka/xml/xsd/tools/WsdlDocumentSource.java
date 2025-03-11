@@ -6,10 +6,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -66,6 +63,46 @@ public class WsdlDocumentSource implements DocumentSource {
         return soapActionList;
     }
 
+    private static String removeTnsPfx(String s, Map<String, String> prefixMap, String targetNamespace) {
+        if (s.contains(":")) {
+            String pfx = s.substring(0, s.indexOf(":"));
+            if (targetNamespace.equals(prefixMap.get(pfx)))
+                return s.substring(s.indexOf(":") + 1);
+        }
+        return s;
+    }
+
+    public Optional<SoapOperation> getOperation(String operationName) throws XPathExpressionException {
+        XPath xp = XmlTools.newXPath();
+        String soapAction = xp.evaluateExpression("//wsdl:binding/wsdl:operation[@name=" + operationName + "]/soap:operation/@soapAction",
+            wsdlDoc, String.class);
+        if (soapAction != null) {
+            Map<String, String> pfxMap = getPrefixMap();
+            String targetNamespace = xp.evaluateExpression("/wsdl:definitions/@targetNamespace",
+                wsdlDoc, String.class);
+            String inputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name=" +
+                    operationName + "]/wsdl:input/@message", wsdlDoc, String.class);
+            String outputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name=" +
+                    operationName + "]/wsdl:output/@message", wsdlDoc, String.class);
+
+            String inputElement =  xp.evaluateExpression("//wsdl:message[@name=" + removeTnsPfx(inputMessage, pfxMap, targetNamespace) +
+                    "]/part/@element", wsdlDoc, String.class);
+            String outputElement =  xp.evaluateExpression("//wsdl:message[@name=" + removeTnsPfx(outputMessage, pfxMap, targetNamespace) +
+                    "]/part/@element", wsdlDoc, String.class);
+
+            String inputElementPfx = inputElement.contains(":") ? inputElement.substring(0, inputElement.indexOf(":")) : null;
+            String outputElementPfx = outputElement.contains(":") ? outputElement.substring(0, outputElement.indexOf(":")) : null;
+
+            String requestRootElemName = inputElementPfx == null ? inputElement : inputElement.substring(inputElementPfx.length() + 1);
+            String requestNamespace = inputElementPfx == null ? targetNamespace : pfxMap.get(inputElementPfx);
+            String responseRootElemName = outputElementPfx == null ? outputElement : outputElement.substring(outputElementPfx.length() + 1);
+            String responseNamespace = outputElementPfx == null ? targetNamespace : pfxMap.get(outputElementPfx);
+
+            return Optional.of(new SoapOperation(soapAction, requestRootElemName, requestNamespace, responseRootElemName, responseRootElemName));
+        }
+        return Optional.empty();
+    }
+
     public Map<String, String> getPrefixMap() {
         if (pfxMap == null) {
             pfxMap = new HashMap<>();
@@ -105,4 +142,12 @@ public class WsdlDocumentSource implements DocumentSource {
             throw new DocumentSourceException("Unable to parse WSDL schema identified by urn " + nsUrn, t);
         }
     }
+
+    public record SoapOperation(
+        String soapAction,
+        String requestRootElementName,
+        String requestNamespace,
+        String responseRootElementName,
+        String responseNamespace
+    ) {}
 }
