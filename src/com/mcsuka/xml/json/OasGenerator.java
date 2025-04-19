@@ -1,0 +1,122 @@
+package com.mcsuka.xml.json;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.mcsuka.xml.xsd.model.SchemaNode;
+import com.mcsuka.xml.xsd.model.SchemaParser;
+import com.mcsuka.xml.xsd.model.SchemaParserFactory;
+import com.mcsuka.xml.xsd.model.SoapRestServiceDefinition;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.namespace.QName;
+import java.util.List;
+
+public class OasGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(OasGenerator.class.getName());
+
+    public static JsonObject generateOas(List<SoapRestServiceDefinition> services, String title, String description, String version) {
+        JsonObject oas = new JsonObject();
+        oas.addProperty("openapi", "3.0.1");
+        JsonObject info = new JsonObject();
+        info.addProperty("title", title);
+        info.addProperty("description", description);
+        info.addProperty("version", version);
+        oas.add("info", info);
+
+        JsonObject paths = new JsonObject();
+        oas.add("paths", paths);
+
+        for (SoapRestServiceDefinition serviceDef: services) {
+            JsonObject service = oasService(serviceDef);
+
+            JsonObject optPath = paths.getAsJsonObject(serviceDef.restPath());
+            JsonObject path = optPath == null ? new JsonObject() : optPath;
+            path.add(serviceDef.restMethod(), service);
+
+            if (optPath == null) {
+                paths.add(serviceDef.restPath(), path);
+            }
+        }
+
+        return oas;
+    }
+
+    static JsonObject createJsonObject(@NotNull String name, @NotNull Object value) {
+        JsonObject o = new JsonObject();
+        switch (value) {
+            case String s:
+                o.addProperty(name, s);
+                break;
+            case Character c:
+                o.addProperty(name, c);
+                break;
+            case Number n:
+                o.addProperty(name, n);
+                break;
+            case Boolean b:
+                o.addProperty(name, b);
+                break;
+            case JsonElement j:
+                o.add(name, j);
+                break;
+            default:
+                o.addProperty(name, value.toString());
+        }
+        return o;
+    }
+
+    static JsonObject contentWithSchema(JsonObject jsonSchema, String description) {
+        JsonObject content = createJsonObject("content",
+            createJsonObject("application/json",
+                createJsonObject("schema", jsonSchema)));
+        content.addProperty("description", description);
+
+        return content;
+    }
+
+    static JsonObject oasService(SoapRestServiceDefinition serviceDef) {
+        JsonObject service = new JsonObject();
+        service.addProperty("description", serviceDef.description());
+        JsonArray parameters = new JsonArray();
+        serviceDef.requestParameters().forEach(paramDef -> {
+            parameters.add(paramDef.asOasServiceParam());
+        });
+
+        serviceDef.wsdlSource()
+            .getOperation(serviceDef.operationName())
+            .ifPresent(op -> {
+                if (serviceDef.restMethod().startsWith("p")) { // post, put, patch
+                    QName reqRoot = op.requestRootElement();
+                    try {
+                        SchemaParser p = SchemaParserFactory.newSchemaParser(reqRoot.getNamespaceURI(), serviceDef.wsdlSource());
+                        SchemaNode requestXmlSchema = p.parse(reqRoot.getLocalPart());
+                        JsonObject requestJsonSchema = Xsd2JsonSchema.renderElement(requestXmlSchema);
+                        service.add("requestBody", contentWithSchema(requestJsonSchema, "Request Body"));
+                    } catch (Exception e) {
+                        logger.warn("Error parsing request schema for path " + serviceDef.restPath(), e);
+                        service.add("requestBody", contentWithSchema(createJsonObject("type", "string"), "Request Body"));
+                    }
+                }
+                QName respRoot = op.responseRootElement();
+                JsonObject responses = new JsonObject();
+                service.add("responses", responses);
+                try {
+                    SchemaParser p = SchemaParserFactory.newSchemaParser(respRoot.getNamespaceURI(), serviceDef.wsdlSource());
+                    SchemaNode responseXmlSchema = p.parse(respRoot.getLocalPart());
+                    JsonObject responseJsonSchema = Xsd2JsonSchema.renderElement(responseXmlSchema);
+                    responses.add("200", contentWithSchema(responseJsonSchema, "Success Response"));
+                } catch (Exception e) {
+                    logger.warn("Error parsing request schema for path " + serviceDef.restPath(), e);
+                    responses.add("200", contentWithSchema(createJsonObject("type", "string"), "Success Response"));
+                }
+            });
+
+        return service;
+    }
+
+
+}
