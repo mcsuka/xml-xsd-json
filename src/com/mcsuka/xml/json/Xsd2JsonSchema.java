@@ -1,7 +1,8 @@
-package com.mcsuka.xml.xsd.model;
+package com.mcsuka.xml.json;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mcsuka.xml.xsd.model.SchemaNode;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +169,7 @@ public class Xsd2JsonSchema {
 
     }
 
-    static JsonObject renderElement(SchemaNode input) {
+    public static JsonObject renderElement(SchemaNode input) {
         if (input.isRecursive()) {
             return new JsonObject();
         }

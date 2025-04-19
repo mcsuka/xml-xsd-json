@@ -85,21 +85,21 @@ public class WsdlDocumentSource implements DocumentSource {
     public Optional<SoapOperation> getOperation(String operationName) {
         try {
             XPath xp = XmlTools.newXPath();
-            String soapAction = xp.evaluateExpression("//wsdl:binding/wsdl:operation[@name=" + operationName + "]/soap:operation/@soapAction",
+            String soapAction = xp.evaluateExpression("//wsdl:binding/wsdl:operation[@name='" + operationName + "']/soap:operation/@soapAction",
                 wsdlDoc, String.class);
             if (soapAction != null) {
                 Map<String, String> pfxMap = getPrefixMap();
                 String targetNamespace = xp.evaluateExpression("/wsdl:definitions/@targetNamespace",
                     wsdlDoc, String.class);
-                String inputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name=" +
-                    operationName + "]/wsdl:input/@message", wsdlDoc, String.class);
-                String outputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name=" +
-                    operationName + "]/wsdl:output/@message", wsdlDoc, String.class);
+                String inputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name='" +
+                    operationName + "']/wsdl:input/@message", wsdlDoc, String.class);
+                String outputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name='" +
+                    operationName + "']/wsdl:output/@message", wsdlDoc, String.class);
 
-                String inputElement = xp.evaluateExpression("//wsdl:message[@name=" + removeTnsPfx(inputMessage, pfxMap, targetNamespace) +
-                    "]/part/@element", wsdlDoc, String.class);
-                String outputElement = xp.evaluateExpression("//wsdl:message[@name=" + removeTnsPfx(outputMessage, pfxMap, targetNamespace) +
-                    "]/part/@element", wsdlDoc, String.class);
+                String inputElement = xp.evaluateExpression("//wsdl:message[@name='" + removeTnsPfx(inputMessage, pfxMap, targetNamespace) +
+                    "']/wsdl:part/@element", wsdlDoc, String.class);
+                String outputElement = xp.evaluateExpression("//wsdl:message[@name='" + removeTnsPfx(outputMessage, pfxMap, targetNamespace) +
+                    "']/wsdl:part/@element", wsdlDoc, String.class);
 
                 String inputElementPfx = inputElement.contains(":") ? inputElement.substring(0, inputElement.indexOf(":")) : null;
                 String outputElementPfx = outputElement.contains(":") ? outputElement.substring(0, outputElement.indexOf(":")) : null;

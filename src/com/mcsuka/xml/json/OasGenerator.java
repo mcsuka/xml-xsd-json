@@ -1,8 +1,12 @@
-package com.mcsuka.xml.xsd.model;
+package com.mcsuka.xml.json;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mcsuka.xml.xsd.model.SchemaNode;
+import com.mcsuka.xml.xsd.model.SchemaParser;
+import com.mcsuka.xml.xsd.model.SchemaParserFactory;
+import com.mcsuka.xml.xsd.model.SoapRestServiceDefinition;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +94,7 @@ public class OasGenerator {
                     try {
                         SchemaParser p = SchemaParserFactory.newSchemaParser(reqRoot.getNamespaceURI(), serviceDef.wsdlSource());
                         SchemaNode requestXmlSchema = p.parse(reqRoot.getLocalPart());
-                        JsonObject requestJsonSchema = Xsd2JsonSchema.translateSchema(requestXmlSchema);
+                        JsonObject requestJsonSchema = Xsd2JsonSchema.renderElement(requestXmlSchema);
                         service.add("requestBody", contentWithSchema(requestJsonSchema, "Request Body"));
                     } catch (Exception e) {
                         logger.warn("Error parsing request schema for path " + serviceDef.restPath(), e);
@@ -103,7 +107,7 @@ public class OasGenerator {
                 try {
                     SchemaParser p = SchemaParserFactory.newSchemaParser(respRoot.getNamespaceURI(), serviceDef.wsdlSource());
                     SchemaNode responseXmlSchema = p.parse(respRoot.getLocalPart());
-                    JsonObject responseJsonSchema = Xsd2JsonSchema.translateSchema(responseXmlSchema);
+                    JsonObject responseJsonSchema = Xsd2JsonSchema.renderElement(responseXmlSchema);
                     responses.add("200", contentWithSchema(responseJsonSchema, "Success Response"));
                 } catch (Exception e) {
                     logger.warn("Error parsing request schema for path " + serviceDef.restPath(), e);

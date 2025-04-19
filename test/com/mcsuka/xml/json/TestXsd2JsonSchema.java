@@ -1,10 +1,13 @@
-package com.mcsuka.xml.xsd.model;
+package com.mcsuka.xml.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mcsuka.xml.testtools.GenericTools;
+import com.mcsuka.xml.xsd.model.SchemaNode;
+import com.mcsuka.xml.xsd.model.SchemaParser;
+import com.mcsuka.xml.xsd.model.SchemaParserFactory;
 import com.mcsuka.xml.xsd.tools.XsdDocumentSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
