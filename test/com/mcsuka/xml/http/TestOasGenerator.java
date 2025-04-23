@@ -1,9 +1,8 @@
-package com.mcsuka.xml.json;
+package com.mcsuka.xml.http;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mcsuka.xml.testtools.GenericTools;
-import com.mcsuka.xml.xsd.model.*;
 import com.mcsuka.xml.xsd.tools.WsdlDocumentSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,16 +22,17 @@ public class TestOasGenerator {
         Map.of("type", "string"),
         false,
         false,
+        null,
         "Correlation ID");
 
     @Test
     public void testWsdl() throws Exception {
         SoapRestServiceDefinition service = new SoapRestServiceDefinition(
+            "http://dummy.net/soap",
             "/oneservice",
             "post",
             List.of(correlationIdHeader),
             new WsdlDocumentSource("file://testdata/input/OneService.wsdl"),
-            null,
             "Operation",
             "A test SOAP Service");
         String expected = GenericTools.getResourceFile("testdata/output/OneService.oas.json");

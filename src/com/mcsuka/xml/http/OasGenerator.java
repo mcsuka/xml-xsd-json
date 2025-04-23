@@ -1,12 +1,12 @@
-package com.mcsuka.xml.json;
+package com.mcsuka.xml.http;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mcsuka.xml.json.Xsd2JsonSchema;
 import com.mcsuka.xml.xsd.model.SchemaNode;
 import com.mcsuka.xml.xsd.model.SchemaParser;
 import com.mcsuka.xml.xsd.model.SchemaParserFactory;
-import com.mcsuka.xml.xsd.model.SoapRestServiceDefinition;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +33,12 @@ public class OasGenerator {
         for (SoapRestServiceDefinition serviceDef: services) {
             JsonObject service = oasService(serviceDef);
 
-            JsonObject optPath = paths.getAsJsonObject(serviceDef.restPath());
+            JsonObject optPath = paths.getAsJsonObject(serviceDef.getRestPath());
             JsonObject path = optPath == null ? new JsonObject() : optPath;
-            path.add(serviceDef.restMethod(), service);
+            path.add(serviceDef.getRestMethod(), service);
 
             if (optPath == null) {
-                paths.add(serviceDef.restPath(), path);
+                paths.add(serviceDef.getRestPath(), path);
             }
         }
 
@@ -80,24 +80,24 @@ public class OasGenerator {
 
     static JsonObject oasService(SoapRestServiceDefinition serviceDef) {
         JsonObject service = new JsonObject();
-        service.addProperty("description", serviceDef.description());
+        service.addProperty("description", serviceDef.getDescription());
         JsonArray parameters = new JsonArray();
-        serviceDef.requestParameters().forEach(paramDef -> {
+        serviceDef.getRequestParameters().forEach(paramDef -> {
             parameters.add(paramDef.asOasServiceParam());
         });
 
-        serviceDef.wsdlSource()
-            .getOperation(serviceDef.operationName())
+        serviceDef.getWsdlSource()
+            .getOperation(serviceDef.getOperationName())
             .ifPresent(op -> {
-                if (serviceDef.restMethod().startsWith("p")) { // post, put, patch
+                if (serviceDef.getRestMethod().startsWith("p")) { // post, put, patch
                     QName reqRoot = op.requestRootElement();
                     try {
-                        SchemaParser p = SchemaParserFactory.newSchemaParser(reqRoot.getNamespaceURI(), serviceDef.wsdlSource());
+                        SchemaParser p = SchemaParserFactory.newSchemaParser(reqRoot.getNamespaceURI(), serviceDef.getWsdlSource());
                         SchemaNode requestXmlSchema = p.parse(reqRoot.getLocalPart());
                         JsonObject requestJsonSchema = Xsd2JsonSchema.renderElement(requestXmlSchema);
                         service.add("requestBody", contentWithSchema(requestJsonSchema, "Request Body"));
                     } catch (Exception e) {
-                        logger.warn("Error parsing request schema for path " + serviceDef.restPath(), e);
+                        logger.warn("Error parsing request schema for path " + serviceDef.getRestPath(), e);
                         service.add("requestBody", contentWithSchema(createJsonObject("type", "string"), "Request Body"));
                     }
                 }
@@ -105,12 +105,12 @@ public class OasGenerator {
                 JsonObject responses = new JsonObject();
                 service.add("responses", responses);
                 try {
-                    SchemaParser p = SchemaParserFactory.newSchemaParser(respRoot.getNamespaceURI(), serviceDef.wsdlSource());
+                    SchemaParser p = SchemaParserFactory.newSchemaParser(respRoot.getNamespaceURI(), serviceDef.getWsdlSource());
                     SchemaNode responseXmlSchema = p.parse(respRoot.getLocalPart());
                     JsonObject responseJsonSchema = Xsd2JsonSchema.renderElement(responseXmlSchema);
                     responses.add("200", contentWithSchema(responseJsonSchema, "Success Response"));
                 } catch (Exception e) {
-                    logger.warn("Error parsing request schema for path " + serviceDef.restPath(), e);
+                    logger.warn("Error parsing request schema for path " + serviceDef.getRestPath(), e);
                     responses.add("200", contentWithSchema(createJsonObject("type", "string"), "Success Response"));
                 }
             });

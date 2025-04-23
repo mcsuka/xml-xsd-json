@@ -5,6 +5,12 @@
 	<groupId>com.mcsuka.xml</groupId>
 	<artifactId>xmlxsdjson</artifactId>
 	<version>0.1</version>
+
+	<properties>
+		<jetty.version>11.0.25</jetty.version>
+		<slf4j.varsion>2.0.17</slf4j.varsion>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -32,12 +38,22 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>2.0.17</version>
+			<version>${slf4j.varsion}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
-			<version>2.0.17</version>
+			<version>${slf4j.varsion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-client</artifactId>
+			<version>${jetty.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains</groupId>
