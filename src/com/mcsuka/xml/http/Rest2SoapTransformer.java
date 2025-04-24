@@ -6,6 +6,7 @@ import com.mcsuka.xml.xsd.tools.XmlTools;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.transform.TransformerException;
 import java.io.ByteArrayOutputStream;
@@ -15,6 +16,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.mcsuka.xml.xsd.tools.XmlTools.SOAP_ENVELOPE_NS;
 
 public class Rest2SoapTransformer {
 
@@ -44,46 +47,64 @@ public class Rest2SoapTransformer {
                     ? (JsonObject)JsonParser.parseString(body)
                     : (JsonObject)JsonParser.parseString("{}");
 
-
                 if (!serviceDef.getRequestParameters().isEmpty()) {
-                    String queryString = servletRequest.getQueryString();
-                    Map<String, List<String>> queryParams = queryString == null
-                        ? Map.of()
-                        : Arrays.stream(queryString.split("&"))
-                        .map(Rest2SoapTransformer::splitQueryParameter)
-                        .collect(Collectors.groupingBy(
-                            Map.Entry::getKey,
-                            HashMap::new,
-                            Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-
-                    for (RequestParameter param : serviceDef.getRequestParameters()) {
-                        if ("path".equals(param.paramType())) {
-                            String[] path = requestUri.split("/");
-                            serviceDef.getPathParamIndex(param.name())
-                                .map(idx -> path[idx])
-                                .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType()));
-                        } else if ("query".equals(param.paramType())) {
-                            Optional.ofNullable(queryParams.get(param.name()))
-                                .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType(), param.multiValue()));
-                        } else if ("header".equals(param.paramType())) {
-                            Optional.ofNullable(servletRequest.getHeader(param.name()))
-                                .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType()));
-                        }
-                    }
+                    addParamsToJson(servletRequest, serviceDef, jsonRoot);
                 }
 
-                Document soapRequest = requestTranslator.translate(jsonRoot);
-                Map<String, String> headers = new HashMap<>();
-                servletRequest.getHeaderNames().asIterator().forEachRemaining(header -> {
-                    if (header.toLowerCase().startsWith("x")) {
-                        headers.put(header, servletRequest.getHeader(header));
-                    }
-                });
-                return new SoapRequest(serviceDef.getTargetUrl(), serviceDef.getSoapAction(), headers, XmlTools.renderDOM(soapRequest));
+                Document soapRequestBody = requestTranslator.translate(jsonRoot);
+                return new SoapRequest(serviceDef.getTargetUrl(), serviceDef.getSoapAction(), wrapInSoapEnvelope(soapRequestBody));
             }
         }
 
         throw new IllegalArgumentException("Could not find service matching request method " + method + " and URI " + requestUri);
+    }
+
+    static String getRequestBody(HttpServletRequest request) throws IOException {
+        try (InputStream inputStream = request.getInputStream()) {
+            if (inputStream != null) {
+                int contentLength = request.getContentLength();
+                int size = contentLength > 0 ? contentLength : 1024;
+                try (ByteArrayOutputStream baos = new ByteArrayOutputStream(size)) {
+                    byte[] buffer = new byte[1024];
+                    int len = inputStream.read(buffer);
+                    while (len >= 0) {
+                        baos.write(buffer, 0, len);
+                        len = inputStream.read(buffer);
+                    }
+                    return baos.toString().trim();
+                }
+            } else {
+                return "";
+            }
+        }
+    }
+
+    static void addParamsToJson(HttpServletRequest servletRequest, SoapRestServiceDefinition serviceDef, JsonObject jsonRoot) {
+        String queryString = servletRequest.getQueryString();
+        Map<String, List<String>> queryParams = queryString == null
+            ? Map.of()
+            : Arrays.stream(queryString.split("&"))
+            .map(Rest2SoapTransformer::splitQueryParameter)
+            .collect(Collectors.groupingBy(
+                Map.Entry::getKey,
+                HashMap::new,
+                Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+        for (RequestParameter param : serviceDef.getRequestParameters()) {
+            if ("path".equals(param.paramType())) {
+                String[] path = servletRequest.getRequestURI().split("/");
+                serviceDef.getPathParamIndex(param.name())
+                    .map(idx -> path[idx])
+                    .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType()));
+            } else if ("query".equals(param.paramType())) {
+                Optional.ofNullable(queryParams.get(param.name()))
+                    .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType(), param.multiValue()));
+            } else if ("header".equals(param.paramType())) {
+                Optional.ofNullable(servletRequest.getHeader(param.name()))
+                    .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType()));
+            }
+        }
+
     }
 
     static Map.Entry<String, String> splitQueryParameter(String it) {
@@ -127,25 +148,18 @@ public class Rest2SoapTransformer {
         }
     }
 
-    static String getRequestBody(HttpServletRequest request) throws IOException {
-        try (InputStream inputStream = request.getInputStream()) {
-            if (inputStream != null) {
-                int contentLength = request.getContentLength();
-                int size = contentLength > 0 ? contentLength : 1024;
-                try (ByteArrayOutputStream baos = new ByteArrayOutputStream(size)) {
-                    byte[] buffer = new byte[1024];
-                    int len = inputStream.read(buffer);
-                    while (len >= 0) {
-                        baos.write(buffer, 0, len);
-                        len = inputStream.read(buffer);
-                    }
-                    return baos.toString().trim();
-                }
-            } else {
-                return "";
-            }
-        }
+    static String wrapInSoapEnvelope(Document soapRequestBody) throws TransformerException {
+        Element requestMessageRoot = soapRequestBody.getDocumentElement();
+        Element soapEnvelope = soapRequestBody.createElementNS(SOAP_ENVELOPE_NS, "SOAP-ENV:Envelope");
+        Element soapBody = soapRequestBody.createElementNS(SOAP_ENVELOPE_NS, "SOAP-ENV:Body");
+        soapEnvelope.appendChild(soapBody);
+        requestMessageRoot.getParentNode().replaceChild(soapEnvelope, requestMessageRoot);
+        soapBody.appendChild(requestMessageRoot);
+
+        return XmlTools.renderDOM(soapRequestBody, false);
     }
+
+
 
     public void transformResponse(HttpServletRequest servletRequest, HttpServletResponse servletResponse, SoapResponse clientResponse) {
 

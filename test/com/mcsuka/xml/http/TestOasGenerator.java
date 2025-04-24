@@ -15,6 +15,10 @@ public class TestOasGenerator {
     private static final Gson GSON = new GsonBuilder()
         .create();
 
+    private static final Gson GSONPretty = new GsonBuilder()
+        .setPrettyPrinting()
+        .create();
+
 
     private final RequestParameter correlationIdHeader = new RequestParameter(
         "X-Correlation-Id",
@@ -41,4 +45,22 @@ public class TestOasGenerator {
 
         Assertions.assertEquals(expected, GSON.toJson(oas));
     }
+
+    @Test
+    public void testWsdlECommerce() throws Exception {
+        SoapRestServiceDefinition service = new SoapRestServiceDefinition(
+            "http://dummy.net/soap",
+            "/order",
+            "post",
+            List.of(correlationIdHeader),
+            new WsdlDocumentSource("file://testdata/input/eCommerce.wsdl"),
+            "PlaceOrder",
+            "A test SOAP Service");
+        String expected = GenericTools.getResourceFile("testdata/output/OneService.oas.json");
+
+        var oas = OasGenerator.generateOas(List.of(service), "Test API", "This is a generated REST API", "0.0.1");
+
+        System.out.println(GSONPretty.toJson(oas));
+    }
+
 }

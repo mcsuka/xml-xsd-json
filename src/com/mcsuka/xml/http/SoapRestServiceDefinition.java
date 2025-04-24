@@ -75,13 +75,13 @@ public class SoapRestServiceDefinition {
             }
         }
 
-        requestSchema = getSchema(WsdlDocumentSource.SoapOperation::requestRootElement);
-        responseSchema = getSchema(WsdlDocumentSource.SoapOperation::responseRootElement);
+//        requestSchema = getSchema(WsdlDocumentSource.SoapOperation::requestRootElement);
+//        responseSchema = getSchema(WsdlDocumentSource.SoapOperation::responseRootElement);
     }
 
     private final Map<String, Integer> pathParamIndex;
-    private final SchemaNode requestSchema;
-    private final SchemaNode responseSchema;
+    private SchemaNode requestSchema;
+    private SchemaNode responseSchema;
 
     public Optional<Integer> getPathParamIndex(String paramName) {
         return Optional.ofNullable(pathParamIndex.get(paramName));

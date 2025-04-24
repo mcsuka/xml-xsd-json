@@ -239,6 +239,8 @@ public class XmlTools {
         return null;
     }
 
+    public static final String SOAP_ENVELOPE_NS = "http://schemas.xmlsoap.org/soap/envelope/";
+
     /**
      * Extended namespace context for XPATH queries
      */
@@ -252,6 +254,8 @@ public class XmlTools {
                 case "xsd", "xs" -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
                 case "wsdl"      -> "http://schemas.xmlsoap.org/wsdl/";
                 case "soap"      -> "http://schemas.xmlsoap.org/wsdl/soap/";
+                case "soapenv",
+                     "SOAP-ENV"  -> SOAP_ENVELOPE_NS;
                 default          -> "";
             };
         }

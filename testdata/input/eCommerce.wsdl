@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+			 xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+			 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			 xmlns:tns="http://example.com/ecommerce"
+			 xmlns:my="http://example.com/ecommerce/schema"
+			 targetNamespace="http://example.com/ecommerce">
+
+	<wsdl:types>
+		<xs:schema targetNamespace="http://example.com/ecommerce/schema">
+			<xs:element name="Product">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ProductId" type="xs:string"/>
+						<xs:element name="ProductName" type="xs:string"/>
+						<xs:element name="Price" type="xs:decimal"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Order">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="OrderId" type="xs:string"/>
+						<xs:element name="CustomerName" type="xs:string"/>
+						<xs:element name="Products">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element ref="my:Product" minOccurs="0" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="OrderStatus">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="OrderStatus" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</wsdl:types>
+
+	<wsdl:message name="GetProductRequest">
+		<wsdl:part name="ProductId" element="my:ProductId"/>
+	</wsdl:message>
+	<wsdl:message name="GetProductResponse">
+		<wsdl:part name="Product" element="my:Product"/>
+	</wsdl:message>
+
+	<wsdl:message name="PlaceOrderRequest">
+		<wsdl:part name="Order" element="my:Order"/>
+	</wsdl:message>
+	<wsdl:message name="PlaceOrderResponse">
+		<wsdl:part name="Confirmation" element="my:OrderStatus"/>
+	</wsdl:message>
+
+	<wsdl:portType name="ECommerceServicePortType">
+		<wsdl:operation name="GetProduct">
+			<wsdl:input message="tns:GetProductRequest"/>
+			<wsdl:output message="tns:GetProductResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="PlaceOrder">
+			<wsdl:input message="tns:PlaceOrderRequest"/>
+			<wsdl:output message="tns:PlaceOrderResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="ECommerceServiceSoapBinding" type="tns:ECommerceServicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetProduct">
+			<soap:operation soapAction="http://example.com/ecommerce/GetProduct"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="PlaceOrder">
+			<soap:operation soapAction="http://example.com/ecommerce/PlaceOrder"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<service name="ECommerceService">
+		<port name="ECommerceServicePort" binding="tns:ECommerceServiceSoapBinding">
+			<soap:address location="http://example.com/ecommerce/service"/>
+		</port>
+	</service>
+
+</wsdl:definitions>
