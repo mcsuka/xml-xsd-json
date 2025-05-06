@@ -448,4 +448,20 @@ public class SchemaNode {
         String mo = (maxOccurs == UNBOUNDED_VALUE ? "n" : "" + maxOccurs);
         return minOccurs + (maxOccurs > minOccurs ? ".." + mo : "");
     }
+
+    public SchemaNode clone(int minOccurs, int maxOccurs) {
+        SchemaNode clone = new SchemaNode(elementName, indicator, namespace, qualified, attribute, any, defaultValue, fixedValue,
+            minOccurs, maxOccurs);
+        clone.w3cType = w3cType;
+        clone.customType = customType;
+        clone.unknownValue = unknownValue;
+        if (restrictions != null) {
+            clone.restrictions = new HashMap<>(restrictions);
+        }
+
+        for (SchemaNode child: children) {
+            clone.addChild(child.clone(child.minOccurs, child.maxOccurs));
+        }
+        return clone;
+    }
 }

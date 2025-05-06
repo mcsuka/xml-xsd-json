@@ -8,10 +8,18 @@
 
 	<wsdl:types>
 		<xs:schema targetNamespace="http://example.com/ecommerce/schema">
+			<xs:element name="ProductId" type="xs:string"/>
+			<xs:element name="ProductReference">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="my:ProductId"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="Product">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="ProductId" type="xs:string"/>
+						<xs:element ref="my:ProductId"/>
 						<xs:element name="ProductName" type="xs:string"/>
 						<xs:element name="Price" type="xs:decimal"/>
 					</xs:sequence>
@@ -43,7 +51,7 @@
 	</wsdl:types>
 
 	<wsdl:message name="GetProductRequest">
-		<wsdl:part name="ProductId" element="my:ProductId"/>
+		<wsdl:part name="ProductReference" element="my:ProductReference"/>
 	</wsdl:message>
 	<wsdl:message name="GetProductResponse">
 		<wsdl:part name="Product" element="my:Product"/>

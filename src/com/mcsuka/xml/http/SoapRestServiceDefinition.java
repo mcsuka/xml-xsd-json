@@ -75,8 +75,8 @@ public class SoapRestServiceDefinition {
             }
         }
 
-//        requestSchema = getSchema(WsdlDocumentSource.SoapOperation::requestRootElement);
-//        responseSchema = getSchema(WsdlDocumentSource.SoapOperation::responseRootElement);
+        requestSchema = getSchema(WsdlDocumentSource.SoapOperation::requestRootElement);
+        responseSchema = getSchema(WsdlDocumentSource.SoapOperation::responseRootElement);
     }
 
     private final Map<String, Integer> pathParamIndex;

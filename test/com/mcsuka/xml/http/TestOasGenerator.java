@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static com.mcsuka.xml.http.SoapServices.*;
+
 public class TestOasGenerator {
 
     private static final Gson GSON = new GsonBuilder()
@@ -20,47 +22,31 @@ public class TestOasGenerator {
         .create();
 
 
-    private final RequestParameter correlationIdHeader = new RequestParameter(
-        "X-Correlation-Id",
-        "header",
-        Map.of("type", "string"),
-        false,
-        false,
-        null,
-        "Correlation ID");
-
     @Test
     public void testWsdl() throws Exception {
-        SoapRestServiceDefinition service = new SoapRestServiceDefinition(
-            "http://dummy.net/soap",
-            "/oneservice",
-            "post",
-            List.of(correlationIdHeader),
-            new WsdlDocumentSource("file://testdata/input/OneService.wsdl"),
-            "Operation",
-            "A test SOAP Service");
         String expected = GenericTools.getResourceFile("testdata/output/OneService.oas.json");
 
-        var oas = OasGenerator.generateOas(List.of(service), "Test API", "This is a generated REST API", "0.0.1");
+        var oas = OasGenerator.generateOas(List.of(OneService), "Test API", "This is a generated REST API", "0.0.1");
 
         Assertions.assertEquals(expected, GSON.toJson(oas));
     }
 
     @Test
-    public void testWsdlECommerce() throws Exception {
-        SoapRestServiceDefinition service = new SoapRestServiceDefinition(
-            "http://dummy.net/soap",
-            "/order",
-            "post",
-            List.of(correlationIdHeader),
-            new WsdlDocumentSource("file://testdata/input/eCommerce.wsdl"),
-            "PlaceOrder",
-            "A test SOAP Service");
-        String expected = GenericTools.getResourceFile("testdata/output/OneService.oas.json");
+    public void testWsdlECommercePost() throws Exception {
+        String expected = GenericTools.getResourceFile("testdata/output/ECommercePost.oas.json");
 
-        var oas = OasGenerator.generateOas(List.of(service), "Test API", "This is a generated REST API", "0.0.1");
+        var oas = OasGenerator.generateOas(List.of(ECommercePost), "Test API", "This is a generated REST API", "0.0.1");
 
-        System.out.println(GSONPretty.toJson(oas));
+        Assertions.assertEquals(expected, GSON.toJson(oas));
+    }
+
+    @Test
+    public void testWsdlECommerceGet() throws Exception {
+        String expected = GenericTools.getResourceFile("testdata/output/ECommerceGet.oas.json");
+
+        var oas = OasGenerator.generateOas(List.of(ECommerceGet), "Test API", "This is a generated REST API", "0.0.1");
+
+        Assertions.assertEquals(expected, GSON.toJson(oas));
     }
 
 }

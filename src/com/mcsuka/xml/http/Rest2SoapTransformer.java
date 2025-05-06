@@ -9,7 +9,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.transform.TransformerException;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
@@ -62,17 +61,8 @@ public class Rest2SoapTransformer {
     static String getRequestBody(HttpServletRequest request) throws IOException {
         try (InputStream inputStream = request.getInputStream()) {
             if (inputStream != null) {
-                int contentLength = request.getContentLength();
-                int size = contentLength > 0 ? contentLength : 1024;
-                try (ByteArrayOutputStream baos = new ByteArrayOutputStream(size)) {
-                    byte[] buffer = new byte[1024];
-                    int len = inputStream.read(buffer);
-                    while (len >= 0) {
-                        baos.write(buffer, 0, len);
-                        len = inputStream.read(buffer);
-                    }
-                    return baos.toString().trim();
-                }
+                byte[] buf = inputStream.readAllBytes();
+                return new String(buf);
             } else {
                 return "";
             }

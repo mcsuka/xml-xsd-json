@@ -85,6 +85,7 @@ public class OasGenerator {
         serviceDef.getRequestParameters().forEach(paramDef -> {
             parameters.add(paramDef.asOasServiceParam());
         });
+        service.add("parameters", parameters);
 
         serviceDef.getWsdlSource()
             .getOperation(serviceDef.getOperationName())
