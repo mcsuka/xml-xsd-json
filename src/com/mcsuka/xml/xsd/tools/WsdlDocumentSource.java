@@ -28,11 +28,8 @@ public class WsdlDocumentSource implements DocumentSource {
     private static final Logger logger = LoggerFactory.getLogger(WsdlDocumentSource.class.getName());
 
     private final Document wsdlDoc;
+    private final Map<String, SoapOperation> operationMap = new HashMap<>();
     private Map<String, String> pfxMap = null;
-
-    public enum OperationType {
-        input, output
-    }
 
     public WsdlDocumentSource(Document wsdlDoc) {
         this.wsdlDoc = wsdlDoc;
@@ -82,44 +79,53 @@ public class WsdlDocumentSource implements DocumentSource {
         return s;
     }
 
-    public Optional<SoapOperation> getOperation(String operationName) {
-        try {
-            XPath xp = XmlTools.newXPath();
-            String soapAction = xp.evaluateExpression("//wsdl:binding/wsdl:operation[@name='" + operationName + "']/soap:operation/@soapAction",
-                wsdlDoc, String.class);
-            if (soapAction != null) {
-                Map<String, String> pfxMap = getPrefixMap();
-                String targetNamespace = xp.evaluateExpression("/wsdl:definitions/@targetNamespace",
+    public synchronized Optional<SoapOperation> getOperation(String operationName) {
+        SoapOperation op = operationMap.get(operationName);
+        if (op != null) {
+            if (!NULL_OPERATION.equals(op)) {
+                return Optional.of(op);
+            }
+        } else {
+            try {
+                XPath xp = XmlTools.newXPath();
+                String soapAction = xp.evaluateExpression("//wsdl:binding/wsdl:operation[@name='" + operationName + "']/soap:operation/@soapAction",
                     wsdlDoc, String.class);
-                String inputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name='" +
-                    operationName + "']/wsdl:input/@message", wsdlDoc, String.class);
-                String outputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name='" +
-                    operationName + "']/wsdl:output/@message", wsdlDoc, String.class);
+                if (soapAction != null) {
+                    Map<String, String> pfxMap = getPrefixMap();
+                    String targetNamespace = xp.evaluateExpression("/wsdl:definitions/@targetNamespace",
+                        wsdlDoc, String.class);
+                    String inputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name='" +
+                        operationName + "']/wsdl:input/@message", wsdlDoc, String.class);
+                    String outputMessage = xp.evaluateExpression("//wsdl:portType/wsdl:operation[@name='" +
+                        operationName + "']/wsdl:output/@message", wsdlDoc, String.class);
 
-                String inputElement = xp.evaluateExpression("//wsdl:message[@name='" + removeTnsPfx(inputMessage, pfxMap, targetNamespace) +
-                    "']/wsdl:part/@element", wsdlDoc, String.class);
-                String outputElement = xp.evaluateExpression("//wsdl:message[@name='" + removeTnsPfx(outputMessage, pfxMap, targetNamespace) +
-                    "']/wsdl:part/@element", wsdlDoc, String.class);
+                    String inputElement = xp.evaluateExpression("//wsdl:message[@name='" + removeTnsPfx(inputMessage, pfxMap, targetNamespace) +
+                        "']/wsdl:part/@element", wsdlDoc, String.class);
+                    String outputElement = xp.evaluateExpression("//wsdl:message[@name='" + removeTnsPfx(outputMessage, pfxMap, targetNamespace) +
+                        "']/wsdl:part/@element", wsdlDoc, String.class);
 
-                String inputElementPfx = inputElement.contains(":") ? inputElement.substring(0, inputElement.indexOf(":")) : null;
-                String outputElementPfx = outputElement.contains(":") ? outputElement.substring(0, outputElement.indexOf(":")) : null;
+                    String inputElementPfx = inputElement.contains(":") ? inputElement.substring(0, inputElement.indexOf(":")) : null;
+                    String outputElementPfx = outputElement.contains(":") ? outputElement.substring(0, outputElement.indexOf(":")) : null;
 
-                return Optional.of(
-                    new SoapOperation(soapAction,
+                    SoapOperation newOp = new SoapOperation(soapAction,
                         inputElementPfx == null
                             ? new QName(targetNamespace, inputElement, XMLConstants.DEFAULT_NS_PREFIX)
                             : new QName(pfxMap.get(inputElementPfx), inputElement.substring(inputElementPfx.length() + 1), inputElementPfx),
                         outputElementPfx == null
                             ? new QName(targetNamespace, outputElement, XMLConstants.DEFAULT_NS_PREFIX)
-                            : new QName(pfxMap.get(outputElementPfx), outputElement.substring(outputElementPfx.length() + 1), outputElementPfx)));
+                            : new QName(pfxMap.get(outputElementPfx), outputElement.substring(outputElementPfx.length() + 1), outputElementPfx));
+                    operationMap.put(operationName, newOp);
+                    return Optional.of(newOp);
+                }
+            } catch (XPathExpressionException e) {
+                logger.warn("Error resolving operation " + operationName, e);
             }
-        } catch (XPathExpressionException e) {
-            logger.warn("Error resolving operation " + operationName, e);
+            operationMap.put(operationName, NULL_OPERATION);
         }
         return Optional.empty();
     }
 
-    public Map<String, String> getPrefixMap() {
+    public synchronized Map<String, String> getPrefixMap() {
         if (pfxMap == null) {
             pfxMap = new HashMap<>();
             HashMap<String, String> attrs = XmlTools.getAttributes(wsdlDoc.getDocumentElement());
@@ -158,6 +164,11 @@ public class WsdlDocumentSource implements DocumentSource {
             throw new DocumentSourceException("Unable to parse WSDL schema identified by urn " + nsUrn, t);
         }
     }
+
+    public static final SoapOperation NULL_OPERATION = new SoapOperation(
+        "%%NOTFOUND%%",
+        new QName("http://dummy.net", "NOTFOUNDREQUEST"),
+        new QName("http://dummy.net", "NOTFOUNDRESPONSE"));
 
     public record SoapOperation(
         String soapAction,

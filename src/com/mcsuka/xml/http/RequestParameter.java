@@ -1,4 +1,4 @@
-package com.mcsuka.xml.xsd.model;
+package com.mcsuka.xml.http;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -16,6 +16,7 @@ import java.util.Map;
  * @param oasTypeDef defines the JSON Schema type, e.g. type, format, pattern, enum, const, default, minimum, maximum, minLength, naxLength, ...
  * @param multiValue multi value parameter, only valid for query param in OAS 3.0
  * @param required required parameter
+ * @param jsonPath JSON element hierarchy to insert this parameter to, which should refer to the target XML element hierarchy
  * @param description free text description
  */
 public record RequestParameter(
@@ -24,8 +25,23 @@ public record RequestParameter(
         Map<String, String> oasTypeDef,
         boolean multiValue,
         boolean required,
+        @Nullable String[] jsonPath,
         @Nullable String description
 ) {
+
+    public RequestParameter {
+        if (!paramType.matches("^(path|query|header)$")) {
+            throw new IllegalArgumentException("paramType value " + paramType + " is invalid, it must match '^(path|query|header)$'");
+        }
+        if (jsonPath == null) {
+            jsonPath = new String[1];
+            jsonPath[0] = name;
+        }
+    }
+
+    public String getOasType() {
+        return oasTypeDef.getOrDefault("type", "string");
+    }
 
     public JsonObject asOasServiceParam() {
         JsonObject paramDef = new JsonObject();

@@ -8,6 +8,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -162,7 +163,7 @@ public class SchemaParser {
         if (rootElemNode == null) {
             if (rootElemName.contains("/")) {
                 String[] tokens = rootElemName.split("/");
-                SchemaNode currentModelNode = parseGlobalElement(tokens[0], null);
+                SchemaNode currentModelNode = parseGlobalElement(tokens[0]);
                 for (int i = 1; i < tokens.length; i++) {
                     if (currentModelNode != null) {
                         currentModelNode =  currentModelNode.getChild(tokens[i]);
@@ -175,7 +176,7 @@ public class SchemaParser {
                     rootElemNode = currentModelNode;
                 }
             } else {
-                rootElemNode = parseGlobalElement(rootElemName, null);
+                rootElemNode = parseGlobalElement(rootElemName);
             }
             if (rootElemNode == null) {
                 throw new IllegalArgumentException("Could not find element '" + rootElemName + "' in XSD " + logXsdLocation);
@@ -185,15 +186,19 @@ public class SchemaParser {
         return rootElemNode;
     }
 
-    private SchemaNode parseGlobalElement(String localName, SchemaNode parentModelNode) throws XPathExpressionException, DocumentSourceException {
-        SchemaNode thisModelNode = null;
+    private SchemaNode parseGlobalElement(String localName) throws XPathExpressionException, DocumentSourceException {
         if (elemNodeMap.containsKey(localName)) {
-            thisModelNode = parseElement(elemNodeMap.get(localName), parentModelNode, true);
-        } else if (groupNodeMap.containsKey(localName)) {
-            thisModelNode = parentModelNode;
-            appendChildNodes(groupNodeMap.get(localName), thisModelNode);
+            return parseElement(elemNodeMap.get(localName), null, true);
         }
-        return thisModelNode;
+        return null;
+    }
+
+    private SchemaNode addGroupElements(String localName, @NotNull SchemaNode parentModelNode) throws XPathExpressionException, DocumentSourceException {
+        if (groupNodeMap.containsKey(localName)) {
+            appendChildNodes(groupNodeMap.get(localName), parentModelNode);
+            return parentModelNode;
+        }
+        return null;
     }
 
     private SchemaNode parseElement(Node xsdNode, SchemaNode parentModelNode, boolean global) throws XPathExpressionException, DocumentSourceException {
@@ -224,17 +229,27 @@ public class SchemaParser {
                 String pfx = (pos < 0 ? "" : elemRef.substring(0, pos));
                 String ns = pfxMap.get(pfx);
                 String localName = (pos < 0 ? elemRef : elemRef.substring(pos + 1));
-                return ns.equals(targetNamespace)
-                    ? parseGlobalElement(localName, parentModelNode)
-                    : SchemaParserFactory
-                        .newSchemaParser(importMap.get(ns), docSource)
-                        .parseGlobalElement(localName, parentModelNode);
+                SchemaParser sp = ns.equals(targetNamespace) ? this : SchemaParserFactory.newSchemaParser(importMap.get(ns), docSource);
+                SchemaNode referredElementNode = sp.parseGlobalElement(localName);
+                if (referredElementNode != null) {
+                    SchemaNode thisModelNode = referredElementNode.clone(
+                        formatCardinality(attrs, "minOccurs"),
+                        formatCardinality(attrs, "maxOccurs"));
+
+                    if (parentModelNode != null) {
+                        parentModelNode.addChild(thisModelNode);
+                    }
+
+                    return thisModelNode;
+                } else if (parentModelNode != null) {
+                    return addGroupElements(localName, parentModelNode);
+                }
             }
         }
         return null;
     }
-
-    private void appendChildNodes(Node xsdNode, SchemaNode modelNode) throws XPathExpressionException, DocumentSourceException {
+//groupNodeMap.containsKey(localName)
+    private void appendChildNodes(Node xsdNode, @NotNull SchemaNode modelNode) throws XPathExpressionException, DocumentSourceException {
         // get children of the element
 
         ArrayList<Element> children = XmlTools.getChildElements(xsdNode);
