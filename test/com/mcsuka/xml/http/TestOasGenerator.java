@@ -3,12 +3,10 @@ package com.mcsuka.xml.http;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mcsuka.xml.testtools.GenericTools;
-import com.mcsuka.xml.xsd.tools.WsdlDocumentSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.mcsuka.xml.http.SoapServices.*;
 

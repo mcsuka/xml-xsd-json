@@ -183,12 +183,12 @@ public class XmlTools {
         return doc;
     }
 
-//    public static Document parseXML(String xml) throws SAXException, IOException {
-//        DocumentBuilder domBuilder = getDocumentBuilder();
-//        InputSource inputSource = new InputSource(new StringReader(xml));
-//        Document doc = domBuilder.parse(inputSource);
-//        return doc;
-//    }
+    public static Document parseXML(String xml) throws SAXException, IOException {
+        DocumentBuilder domBuilder = getDocumentBuilder();
+        InputSource inputSource = new InputSource(new StringReader(xml));
+        Document doc = domBuilder.parse(inputSource);
+        return doc;
+    }
 
     @NotNull
     public static ArrayList<Element> getChildElements(@NotNull Node n) {

@@ -1,5 +1,6 @@
 package com.mcsuka.xml.json;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.google.gson.JsonPrimitive;
 import com.mcsuka.xml.xsd.model.SchemaNode;
 import com.mcsuka.xml.xsd.model.SchemaNode.DataType;
 import com.mcsuka.xml.xsd.tools.XmlTools;
+import org.xml.sax.SAXException;
 
 /**
  * XML to JSON translator, optionally with XML Schema support The XML root
@@ -173,9 +175,10 @@ public class Xml2Json {
      * @param xml XML text
      * @return JSONObject or JSONArray or String (Only text nodes in the XML root
      *         element)
-     * @throws Exception parsing or translation failed
+     * @throws IOException IO operation failed
+     * @throws SAXException parsing or translation failed
      */
-    public JsonElement translate(String xml) throws Exception {
+    public JsonElement translate(String xml) throws IOException, SAXException {
         DocumentBuilder builder = XmlTools.getDocumentBuilder();
         Document doc = builder.parse(new InputSource(new StringReader(xml)));
         Element xmlRoot = doc.getDocumentElement();
