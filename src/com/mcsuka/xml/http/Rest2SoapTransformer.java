@@ -2,15 +2,15 @@ package com.mcsuka.xml.http;
 
 import com.google.gson.*;
 import com.mcsuka.xml.json.Json2Xml;
+import com.mcsuka.xml.json.Xml2Json;
 import com.mcsuka.xml.xsd.tools.XmlTools;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -30,50 +30,37 @@ public class Rest2SoapTransformer {
         }
     }
 
-    public SoapRequest transformRequest(HttpServletRequest servletRequest) throws IllegalArgumentException, IOException, TransformerException {
-        String requestUri = servletRequest.getRequestURI();
-        String method = servletRequest.getMethod();
-
+    public SoapRequest transformRequest(RestRequest restRequest) throws IllegalArgumentException, TransformerException {
         for (Map.Entry<String, SoapRestServiceDefinition> entry: serviceMap.entrySet()) {
             SoapRestServiceDefinition serviceDef = entry.getValue();
-            if (method.equals(serviceDef.getRestMethod()) && requestUri.matches(entry.getKey())) {
+            if (restRequest.method().equals(serviceDef.getRestMethod()) && restRequest.requestUri().matches(entry.getKey())) {
 
                 Json2Xml requestTranslator = serviceDef.getRequestSchema().map(Json2Xml::new)
-                    .orElseThrow(() -> new IllegalArgumentException("Could not find WSDL matching request method " + method + " and URI " + requestUri));
+                    .orElseThrow(() -> new IllegalArgumentException("Could not find WSDL matching request method "
+                        + restRequest.method() + " and URI " + restRequest.requestUri()));
 
-                String body = getRequestBody(servletRequest);
+                String body = restRequest.body() == null ? "" : restRequest.body();
                 JsonObject jsonRoot = body.startsWith("{") || body.startsWith("[")
                     ? (JsonObject)JsonParser.parseString(body)
                     : (JsonObject)JsonParser.parseString("{}");
 
                 if (!serviceDef.getRequestParameters().isEmpty()) {
-                    addParamsToJson(servletRequest, serviceDef, jsonRoot);
+                    addParamsToJson(restRequest, serviceDef, jsonRoot);
                 }
 
                 Document soapRequestBody = requestTranslator.translate(jsonRoot);
-                return new SoapRequest(serviceDef.getTargetUrl(), serviceDef.getSoapAction(), wrapInSoapEnvelope(soapRequestBody));
+                return new SoapRequest(serviceDef, wrapInSoapEnvelope(soapRequestBody));
             }
         }
 
-        throw new IllegalArgumentException("Could not find service matching request method " + method + " and URI " + requestUri);
+        throw new IllegalArgumentException("Could not find service matching request method " +
+            restRequest.method() + " and URI " + restRequest.requestUri());
     }
 
-    static String getRequestBody(HttpServletRequest request) throws IOException {
-        try (InputStream inputStream = request.getInputStream()) {
-            if (inputStream != null) {
-                byte[] buf = inputStream.readAllBytes();
-                return new String(buf);
-            } else {
-                return "";
-            }
-        }
-    }
-
-    static void addParamsToJson(HttpServletRequest servletRequest, SoapRestServiceDefinition serviceDef, JsonObject jsonRoot) {
-        String queryString = servletRequest.getQueryString();
-        Map<String, List<String>> queryParams = queryString == null
+    static void addParamsToJson(RestRequest restRequest, SoapRestServiceDefinition serviceDef, JsonObject jsonRoot) {
+        Map<String, List<String>> queryParams = restRequest.queryString() == null
             ? Map.of()
-            : Arrays.stream(queryString.split("&"))
+            : Arrays.stream(restRequest.queryString().split("&"))
             .map(Rest2SoapTransformer::splitQueryParameter)
             .collect(Collectors.groupingBy(
                 Map.Entry::getKey,
@@ -82,7 +69,7 @@ public class Rest2SoapTransformer {
 
         for (RequestParameter param : serviceDef.getRequestParameters()) {
             if ("path".equals(param.paramType())) {
-                String[] path = servletRequest.getRequestURI().split("/");
+                String[] path = restRequest.requestUri().split("/");
                 serviceDef.getPathParamIndex(param.name())
                     .map(idx -> path[idx])
                     .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType()));
@@ -90,7 +77,7 @@ public class Rest2SoapTransformer {
                 Optional.ofNullable(queryParams.get(param.name()))
                     .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType(), param.multiValue()));
             } else if ("header".equals(param.paramType())) {
-                Optional.ofNullable(servletRequest.getHeader(param.name()))
+                Optional.ofNullable(restRequest.getHeader(param.name()))
                     .ifPresent(value -> addValueToJson(jsonRoot, param.jsonPath(), value, param.getOasType()));
             }
         }
@@ -149,10 +136,24 @@ public class Rest2SoapTransformer {
         return XmlTools.renderDOM(soapRequestBody, false);
     }
 
+    private static final Gson GSON = new GsonBuilder()
+        .create();
 
+    public RestResponse transformResponse(SoapRestServiceDefinition serviceDef, SoapResponse clientResponse) throws IOException, SAXException, XPathExpressionException {
+        Document soapResponseDoc = XmlTools.parseXML(clientResponse.body());
+        Element soapBody = XmlTools.newXPath().evaluateExpression("//SOAP-ENV:Body/*", soapResponseDoc, Element.class);
 
-    public void transformResponse(HttpServletRequest servletRequest, HttpServletResponse servletResponse, SoapResponse clientResponse) {
-
+        if (clientResponse.status() == 200 && soapBody != null) {
+            Xml2Json responseTranslator = serviceDef.getResponseSchema()
+                .map(schema -> new Xml2Json(true, schema))
+                .orElse(new Xml2Json(true));
+            JsonElement response = responseTranslator.translate(soapBody);
+            return new RestResponse(200, GSON.toJson(response));
+        } else {
+            Xml2Json responseTranslator = new Xml2Json(true);
+            JsonElement response = responseTranslator.translate(soapBody != null ? soapBody : soapResponseDoc.getDocumentElement());
+            return new RestResponse(clientResponse.status(), GSON.toJson(response));
+        }
     }
 
 }
