@@ -13,7 +13,7 @@ public record RestRequest(
     @NotNull String requestUri,
     String queryString,
     String body,
-    NavigableMap<String, String> headers
+    @NotNull NavigableMap<String, String> headers
 ) {
 
     public String getHeader(String headerName) {

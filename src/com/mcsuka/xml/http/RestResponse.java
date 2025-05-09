@@ -1,7 +1,7 @@
 package com.mcsuka.xml.http;
 
 public record RestResponse(
-    Integer status,
+    int status,
     String body
 ) {
 }

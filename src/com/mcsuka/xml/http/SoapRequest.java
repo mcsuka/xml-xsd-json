@@ -1,7 +1,9 @@
 package com.mcsuka.xml.http;
 
+import org.jetbrains.annotations.NotNull;
+
 public record SoapRequest(
-    SoapRestServiceDefinition serviceDef,
-    String contents
+    @NotNull SoapRestServiceDefinition serviceDef,
+    @NotNull String contents
 ) {
 }
