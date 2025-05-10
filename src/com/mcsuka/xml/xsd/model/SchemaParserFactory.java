@@ -17,7 +17,7 @@ import com.mcsuka.xml.xsd.tools.DocumentSourceException;
  */
 public class SchemaParserFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(SchemaParserFactory.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SchemaParserFactory.class);
     private static final ConcurrentHashMap<String, SchemaParser> modelCache = new ConcurrentHashMap<>();
 
     /**
