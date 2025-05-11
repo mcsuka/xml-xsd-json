@@ -50,7 +50,7 @@ public class SchemaParserFactory {
      */
     public static String normalizeUrl(String url) {
         logger.debug("Received URL: " + url);
-        String[] urlParts = url.replace('\\', '/').split("/");
+        String[] urlParts = url.replace('\\', '/').split("/", -1);
         List<String> newUrlParts = Arrays.stream(urlParts)
                 .collect(ArrayList::new,
                         (c, e) -> {

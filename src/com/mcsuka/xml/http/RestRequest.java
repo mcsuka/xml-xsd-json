@@ -22,7 +22,7 @@ public record RestRequest(
 
     public static RestRequest fromHttpRequest(HttpServletRequest servletRequest) throws IOException {
         String requestUri = servletRequest.getRequestURI();
-        String method = servletRequest.getMethod();
+        String method = servletRequest.getMethod().toLowerCase();
         String queryString = servletRequest.getQueryString();
         String body = getRequestBody(servletRequest);
         NavigableMap<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);

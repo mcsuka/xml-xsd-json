@@ -1,5 +1,6 @@
 package com.mcsuka.xml.proxy;
 
+import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.slf4j.Logger;
@@ -15,7 +16,12 @@ import java.util.concurrent.TimeUnit;
 public class RestToSoapProxyApp extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(RestToSoapProxyApp.class);
-    private static Semaphore waitTillShutdown = new Semaphore(1);
+    private static final Semaphore waitTillShutdown = new Semaphore(1);
+
+    private final ProxySettings settings;
+    private ClientHandler clientHandler;
+    private HttpClient httpClient;
+    private Server server;
 
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -31,14 +37,15 @@ public class RestToSoapProxyApp extends Thread {
             app.initialize();
             app.addShutdownHook();
             app.start();
+            logger.info("ProxyApp has started");
 
         } catch (Throwable t) {
             logger.error("Unexpected exception at startup", t);
         }
     }
 
-    public RestToSoapProxyApp(Properties props) {
-
+    public RestToSoapProxyApp(Properties props) throws Exception {
+        settings = ProxySettings.propsToSettings(props);
     }
 
     @Override
@@ -47,6 +54,21 @@ public class RestToSoapProxyApp extends Thread {
             waitTillShutdown.acquire();
         } catch (InterruptedException ie) {
             logger.error("The main thread was interrupted", ie);
+        }
+    }
+
+    @Override
+    public void start() {
+        waitTillShutdown.acquireUninterruptibly();
+        super.start();
+
+        try {
+            httpClient.start();
+            clientHandler.start();
+            server.start();
+
+        } catch (Exception e) {
+            logger.error("Unexcepted exception at startup", e);
         }
     }
 
@@ -65,14 +87,37 @@ public class RestToSoapProxyApp extends Thread {
         });
     }
 
-    void initialize() {
-        waitTillShutdown.acquireUninterruptibly();
-
+    void initialize() throws Exception {
+        httpClient = createHttpClient(settings);
+        clientHandler = new ClientHandler(settings, httpClient);
+        server = createServer(settings, clientHandler);
     }
 
-    void terminate() {
+    void terminate() throws Exception {
+        logger.info("ProxyApp is stopping");
+
+        httpClient.stop();
+        clientHandler.stop();
+        server.stop();
 
         waitTillShutdown.release();
+    }
+
+    private static HttpClient createHttpClient(ProxySettings settings) {
+        HttpClient client = new HttpClient();
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+            2,
+            settings.maxServerPoolSize(),
+            settings.clientKeepAliveTimeMs(),
+            TimeUnit.MILLISECONDS,
+            new SynchronousQueue<>(),
+            new SimpleThreadFactory("client-threads", Thread.NORM_PRIORITY, true));
+        threadPoolExecutor.prestartAllCoreThreads();
+        client.setExecutor(new ExecutorThreadPool(threadPoolExecutor));
+        client.setIdleTimeout(settings.clientKeepAliveTimeMs());
+        client.setConnectTimeout(settings.connectTimeoutMs());
+
+        return client;
     }
 
     private static Server createServer(ProxySettings settings, Handler handler) {

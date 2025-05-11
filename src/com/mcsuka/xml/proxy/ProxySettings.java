@@ -17,14 +17,14 @@ public record ProxySettings(
     Integer serverKeepAliveTimeMs,
     Integer clientKeepAliveTimeMs,
     Integer connectTimeoutMs,
-    List<SoapRestServiceDefinition> services
+        List<SoapRestServiceDefinition> services
 ){
     static ProxySettings propsToSettings(Properties props) throws Exception {
         List<SoapRestServiceDefinition> services = new ArrayList<>();
 
         for(String key: props.stringPropertyNames()) {
-            if (key.matches("^rest2soap.service\\.[A-Za-z0-9_]+\\.name$")) {
-                String prefix = key.substring(0, key.indexOf(".name"));
+            if (key.matches("^rest2soap.service\\.[A-Za-z0-9_]+\\.restPath$")) {
+                String prefix = key.substring(0, key.indexOf(".restPath"));
                 services.add(propsToServiceDef(props, prefix));
             }
         }
@@ -42,10 +42,11 @@ public record ProxySettings(
     }
 
 
-    public static SoapRestServiceDefinition propsToServiceDef(Properties props, String prefix) throws Exception {
+    static SoapRestServiceDefinition propsToServiceDef(Properties props, String prefix) throws Exception {
 
         String[] params = props.getProperty(prefix + ".paramList").split("[|]");
         List<RequestParameter> requestParams = Arrays.stream(params)
+            .filter(s -> !s.isBlank())
             .map(param ->
                 new RequestParameter(
                     props.getProperty("rest.params." + param + ".name"),
