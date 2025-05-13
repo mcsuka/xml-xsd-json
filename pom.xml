@@ -5,7 +5,12 @@
 	<groupId>com.mcsuka.xml</groupId>
 	<artifactId>xmlxsdjson</artifactId>
 	<version>0.1</version>
-
+	<!--
+	<packaging>pom</packaging>
+	<modules>
+		<module>soapserver</module>
+	</modules>
+	-->
 	<properties>
 		<jetty.version>11.0.25</jetty.version>
 		<slf4j.varsion>2.0.17</slf4j.varsion>
@@ -64,13 +69,13 @@
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>RELEASE</version>
+			<version>26.0.2</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test</testSourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<outputDirectory>classes</outputDirectory>
 		<testOutputDirectory>test-classes</testOutputDirectory>
 		<testResources>
@@ -79,14 +84,27 @@
 			</testResource>
 		</testResources>
     <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.14.0</version>
-        <configuration>
-          <source>21</source>
-          <target>21</target>
-        </configuration>
-      </plugin>
+        <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.14.0</version>
+            <configuration>
+                <source>21</source>
+                <target>21</target>
+            </configuration>
+        </plugin>
+		<plugin>
+			<artifactId>maven-assembly-plugin</artifactId>
+			<configuration>
+				<archive>
+					<manifest>
+						<mainClass>com.mcsuka.xml.proxy.RestToSoapProxyApp</mainClass>
+					</manifest>
+				</archive>
+				<descriptorRefs>
+					<descriptorRef>jar-with-dependencies</descriptorRef>
+				</descriptorRefs>
+			</configuration>
+		</plugin>
     </plugins>
 	</build>
 </project>
