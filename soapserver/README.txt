@@ -6,6 +6,8 @@ Changes:
 - removed Spring and Netty parts
 - removed SOAP client code
 - modified SOAP server code to remember customer data
+- added get customer by id operation
+- added delete customer operation
 
 compile:
 `mvn clean install`
