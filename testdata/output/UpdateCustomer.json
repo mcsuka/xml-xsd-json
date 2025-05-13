@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "properties": {
+    "customer": {
+      "type": "object",
+      "properties": {
+        "customerId": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "numOrders": {
+          "type": "integer"
+        },
+        "revenue": {
+          "type": "number"
+        },
+        "test": {
+          "type": "number"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "PRIVATE",
+            "BUSINESS"
+          ]
+        }
+      },
+      "required": [
+        "customerId",
+        "revenue"
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://customerservice.example.com/?updateCustomer"
+}

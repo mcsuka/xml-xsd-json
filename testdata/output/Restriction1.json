@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "customerType": {
+      "type": "string",
+      "enum": [
+        "PRIVATE",
+        "BUSINESS"
+      ]
+    },
+    "msisdn": {
+      "type": "string",
+      "pattern": "\\+\\d+",
+      "minLength": 10,
+      "maxLength": 20
+    }
+  },
+  "required": [
+    "customerType",
+    "msisdn"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://dummy?root2"
+}

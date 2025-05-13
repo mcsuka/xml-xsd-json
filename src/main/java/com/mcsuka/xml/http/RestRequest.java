@@ -43,4 +43,9 @@ public record RestRequest(
         }
     }
 
+    @Override
+    public @NotNull String toString() {
+        return "URI: " + method + " " + requestUri + " Query: " + queryString + " Headers: " + headers + " Body: " + body;
+    }
+
 }

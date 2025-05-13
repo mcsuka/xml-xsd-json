@@ -1,0 +1,27 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "a": {
+        "type": "string",
+        "enum": [
+          "X",
+          "Y",
+          "Z"
+        ]
+      },
+      "b": {
+        "type": "string",
+        "pattern": "[1-5][0-9]{3}"
+      }
+    },
+    "required": [
+      "a",
+      "b"
+    ]
+  },
+  "minItems": 1,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://dummy?root"
+}

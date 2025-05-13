@@ -15,7 +15,7 @@ public record ProxySettings(
     Integer serverKeepAliveTimeMs,
     Integer clientKeepAliveTimeMs,
     Integer connectTimeoutMs,
-        List<SoapRestServiceDefinition> services
+    List<SoapRestServiceDefinition> services
 ){
     static ProxySettings propsToSettings(Properties props) throws Exception {
         List<SoapRestServiceDefinition> services = new ArrayList<>();

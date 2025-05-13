@@ -135,7 +135,7 @@ public class Rest2SoapTransformer {
         .create();
 
     public RestResponse transformResponse(SoapRestServiceDefinition serviceDef, SoapResponse clientResponse) throws IOException, SAXException, XPathExpressionException {
-        Document soapResponseDoc = XmlTools.parseXML(clientResponse.body());
+        Document soapResponseDoc = XmlTools.parseXML(clientResponse.contents());
         Element soapBody = XmlTools.newXPath().evaluateExpression("//SOAP-ENV:Body/*", soapResponseDoc, Element.class);
 
         if (clientResponse.status() == 200 && soapBody != null) {
@@ -143,7 +143,11 @@ public class Rest2SoapTransformer {
                 .map(schema -> new Xml2Json(true, schema))
                 .orElse(new Xml2Json(true));
             JsonElement response = responseTranslator.translate(soapBody);
-            return new RestResponse(200, GSON.toJson(response));
+            if (response.isJsonNull() || response.isJsonObject() && response.getAsJsonObject().isEmpty()) {
+                return new RestResponse(404, GSON.toJson(response));
+            } else {
+                return new RestResponse(200, GSON.toJson(response));
+            }
         } else {
             Xml2Json responseTranslator = new Xml2Json(true);
             JsonElement response = responseTranslator.translate(soapBody != null ? soapBody : soapResponseDoc.getDocumentElement());

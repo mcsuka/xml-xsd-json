@@ -22,6 +22,7 @@ import java.util.*;
 
 import com.example.customerservice.*;
 import jakarta.annotation.Resource;
+import jakarta.xml.ws.Holder;
 import jakarta.xml.ws.WebServiceContext;
 
 public class CustomerServiceImpl implements CustomerService {
@@ -33,27 +34,24 @@ public class CustomerServiceImpl implements CustomerService {
     @Resource
     WebServiceContext wsContext;
 
-    Map<String, Customer> customers = new HashMap<>();
+    Map<Integer, Customer> customers = new HashMap<>();
 
-    public List<Customer> getCustomersByName(String name) throws NoSuchCustomerException {
-        if ("None".equals(name)) {
-            NoSuchCustomer noSuchCustomer = new NoSuchCustomer();
-            noSuchCustomer.setCustomerName(name);
-            throw new NoSuchCustomerException("Did not find any matching customer for name=" + name,
-                                              noSuchCustomer);
-        }
-
-        Customer c = customers.get(name);
-        if (c == null) {
-            return List.of();
-        } else {
-            return List.of(c);
-        }
+    public List<Customer> getCustomersByName(String name) {
+        return customers.values().stream().filter(c -> c.getName().equals(name)).toList();
     }
+
+    public Customer getCustomer(int customerId) {
+        return customers.get(customerId);
+    }
+
+    public Customer deleteCustomer(int customerId) {
+        return customers.remove(customerId);
+    }
+
 
     public String updateCustomer(Customer customer) {
         System.out.println("update request was received");
-        Customer oldCust =  customers.put(customer.getName(), customer);
+        Customer oldCust =  customers.put(customer.getCustomerId(), customer);
         System.out.println("Customer was updated");
         return (oldCust == null ? "CREATED" : "UPDATED");
     }

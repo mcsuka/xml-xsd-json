@@ -8,6 +8,11 @@ import java.util.NavigableMap;
 
 public record SoapResponse(
     int status,
-    @NotNull String body
+    @NotNull String contents
 ) {
+
+    @Override
+    public @NotNull String toString() {
+        return "Status: " + status + "SOAPAction: " + " Contents: " + contents;
+    }
 }

@@ -64,21 +64,6 @@ public class SchemaParserFactory {
                         },
                         List::addAll
                 );
-//        ArrayList<String> newUrlParts = new ArrayList<>();
-//        for (String part : urlParts) {
-//            if (".".equals(part)) {
-//                // do nothing, do not add the part to the URL
-//            } else if ("..".equals(part)) {
-//                // remove last part
-//                int newLen = newUrlParts.size();
-//                if (newLen == 0) {
-//                    throw new RuntimeException("Unable to normalize the following URL: " + url);
-//                }
-//                newUrlParts.remove(newLen - 1);
-//            } else {
-//                newUrlParts.add(part);
-//            }
-//        }
         return String.join("/", newUrlParts);
     }
 

@@ -8,6 +8,7 @@ import com.mcsuka.xml.testtools.GenericTools;
 import com.mcsuka.xml.xsd.model.SchemaNode;
 import com.mcsuka.xml.xsd.model.SchemaParser;
 import com.mcsuka.xml.xsd.model.SchemaParserFactory;
+import com.mcsuka.xml.xsd.tools.WsdlDocumentSource;
 import com.mcsuka.xml.xsd.tools.XsdDocumentSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -85,4 +86,37 @@ public class TestXsd2JsonSchema {
 
         Assertions.assertEquals(GSON.fromJson(expected, JsonObject.class), jschema);
     }
+
+    @Test
+    public void testWsdl() throws Exception {
+        SchemaParser model = SchemaParserFactory.newSchemaParser(
+            "http://customerservice.example.com/",
+            new WsdlDocumentSource("file://testdata/input/CustomerService.wsdl"));
+        SchemaNode n = model.parse("updateCustomer");
+        JsonObject jschema = Xsd2JsonSchema.translateSchema(n);
+        String expected = GenericTools.getResourceFile("testdata/output/UpdateCustomer.json");
+
+        Assertions.assertEquals(GSON.fromJson(expected, JsonObject.class), jschema);
+    }
+
+    @Test
+    public void testRestriction() throws Exception {
+        SchemaParser model = SchemaParserFactory.newSchemaParser("testdata/input/Restriction.xsd", new XsdDocumentSource());
+        SchemaNode n = model.parse("root");
+        JsonObject jschema = Xsd2JsonSchema.translateSchema(n);
+        String expected = GenericTools.getResourceFile("testdata/output/Restriction.json");
+
+        Assertions.assertEquals(GSON.fromJson(expected, JsonObject.class), jschema);
+    }
+
+    @Test
+    public void testRestriction1() throws Exception {
+        SchemaParser model = SchemaParserFactory.newSchemaParser("testdata/input/Restriction.xsd", new XsdDocumentSource());
+        SchemaNode n = model.parse("root2");
+        JsonObject jschema = Xsd2JsonSchema.translateSchema(n);
+        String expected = GenericTools.getResourceFile("testdata/output/Restriction1.json");
+
+        Assertions.assertEquals(GSON.fromJson(expected, JsonObject.class), jschema);
+    }
+
 }

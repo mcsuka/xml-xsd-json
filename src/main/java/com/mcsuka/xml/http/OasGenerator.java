@@ -1,8 +1,6 @@
 package com.mcsuka.xml.http;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.mcsuka.xml.json.Xsd2JsonSchema;
 import com.mcsuka.xml.xsd.model.SchemaNode;
 import com.mcsuka.xml.xsd.model.SchemaParser;
@@ -17,6 +15,10 @@ import java.util.List;
 public class OasGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OasGenerator.class.getName());
+
+    private static final Gson GSON = new GsonBuilder()
+        .setPrettyPrinting()
+        .create();
 
     public static JsonObject generateOas(List<SoapRestServiceDefinition> services, String title, String description, String version) {
         JsonObject oas = new JsonObject();

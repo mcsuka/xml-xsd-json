@@ -25,4 +25,26 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	<xs:element name="root2">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="customerType" type="CustomerType"/>
+				<xs:element name="msisdn" type="MSISDN"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="CustomerType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PRIVATE"/>
+			<xs:enumeration value="BUSINESS"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MSISDN">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="10"/>
+			<xs:maxLength value="20"/>
+			<xs:pattern value="\+\d+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
 </xs:schema>

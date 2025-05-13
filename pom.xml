@@ -5,11 +5,12 @@
 	<groupId>com.mcsuka.xml</groupId>
 	<artifactId>xmlxsdjson</artifactId>
 	<version>0.1</version>
-<!--	<packaging>pom</packaging>
-        <modules>
-            <module>soapserver</module>
-        </modules> -->
-
+	<!--
+	<packaging>pom</packaging>
+	<modules>
+		<module>soapserver</module>
+	</modules>
+	-->
 	<properties>
 		<jetty.version>11.0.25</jetty.version>
 		<slf4j.varsion>2.0.17</slf4j.varsion>
@@ -96,7 +97,7 @@
 			<configuration>
 				<archive>
 					<manifest>
-						<mainClass>nl.odido.eai.tyk.wssplugin.PluginServer</mainClass>
+						<mainClass>com.mcsuka.xml.proxy.RestToSoapProxyApp</mainClass>
 					</manifest>
 				</archive>
 				<descriptorRefs>

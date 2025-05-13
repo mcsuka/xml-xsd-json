@@ -79,10 +79,9 @@ public class ClientHandler extends HandlerWrapper {
         } else {
             try {
                 RestRequest restRequest = RestRequest.fromHttpRequest(servletRequest);
+                logger.info("Received REST Request: {}", restRequest);
                 SoapRequest soapRequest = transformer.transformRequest(restRequest);
-                logger.info(soapRequest.serviceDef().getTargetUrl());
-                logger.info(soapRequest.serviceDef().getSoapAction());
-                logger.info(soapRequest.contents());
+                logger.info("Sending SOAP Request: {}", soapRequest);
                 HttpRequest clientRequest = (HttpRequest) client.newRequest(soapRequest.serviceDef().getTargetUrl());
                 clientRequest.method(HttpMethod.POST);
                 clientRequest.version(HttpVersion.HTTP_1_1);
@@ -90,9 +89,9 @@ public class ClientHandler extends HandlerWrapper {
                 clientRequest.body(new StringRequestContent(soapRequest.contents()));
                 HttpContentResponse clientResponse = (HttpContentResponse)clientRequest.send();
                 SoapResponse soapResponse = new SoapResponse(clientResponse.getStatus(), new String(clientResponse.getContent()));
-                logger.info(soapResponse.body());
+                logger.info("Received SOAP Response: {}", soapResponse);
                 RestResponse restResponse = transformer.transformResponse(soapRequest.serviceDef(), soapResponse);
-                logger.info(restResponse.body());
+                logger.info("Sending REST Response: {}", restResponse);
                 servletResponse.getWriter().write(restResponse.body());
                 servletResponse.setStatus(restResponse.status());
 

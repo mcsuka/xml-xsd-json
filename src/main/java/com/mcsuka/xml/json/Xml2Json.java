@@ -148,7 +148,7 @@ public class Xml2Json {
                     }
                 }
             }
-        } else if (!xsdNode.isSimpleType()) {
+        } else if (xsdNode != null && !xsdNode.isSimpleType()) {
             return walkEmpty(jsonNode, xsdNode);
         } else {
             String stringValue = xmlNode.getTextContent();
