@@ -91,4 +91,4 @@ run: `java -cp target/xmlxsdjson-0.1-jar-with-dependencies.jar com.mcsuka.xml.pr
 
 ## Demo SOAP Service
 implementation: in the separate soapserver module\
-This is a modified copy of the WSDL First Demo of the Apache CXF project (https://github.com/apache/cxf). For more info, please refer to [soapserver/README.txt]()
+This is a modified copy of the WSDL First Demo of the Apache CXF project (https://github.com/apache/cxf). For more info, please refer to [soapserver/README.txt](soapserver/README.txt)
