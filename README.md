@@ -1,8 +1,20 @@
 # xml-xsd-json
-XML Schema visualization and XML Schema based XML &lt;-> JSON conversion
+Generic library to
+* parse and visualize XML Schemas
+* transform JSON to XML, guided by XML Schema
+* transform XML to JSON, guided by XML schema
+* expose SOAP services as REST/JSON, including
+  * generating OAS 3.0 API spec from the WSDLs
+  * transforming the REST request to SOAP request
+  * transforming the SOAP response as REST response
+
+Demo REST to SOAP proxy service, with embedded Jetty HTTP server/client.
+
+Please note all code is provided as-is, without any warranty.
 
 ## XML Schema Visualization
-The com.mcsuka.xml.xsd package implements an XML Schema parser. It converts an XSD file (or a number of related XSD files) to a simple tree of 'SchemaNode' objects. Each SchemaNode represents one of the following:
+implementation: com.mcsuka.xml.xsd.SchemaParser\
+The  XML Schema parser converts an XSD file (or a number of related XSD files) to a simple tree of 'SchemaNode' objects. Each SchemaNode represents one of the following:
 * an element: xsd:element or xsd:any
 * an attribute: xsd:attribute or xsd:anyAttribute
 * an indicator: xsd:sequence xsd:all or xsd:choice
@@ -27,7 +39,7 @@ Each SchemaNode has the following properties:
 The XML schema can be visualized as a text document using the `dumpTree()` convenience function of the SchemaNode class. Other visualizations (HTML, graphic, ...) can be easily implemented as separate classes.
 
 ## XML to JSON translation
-The com.mcsuka.xml.json package implements an XML/JSON translator, using the GSON, Xerces and Saxon-HE libraries.
+implementation: com.mcsuka.xml.json.Xml2Json\
 Translation may or may not use an XML Schema. Using an XML schema has the following advantages:
 * keep types: the resulting JSON will contain boolean and numeric values without quotes
 * keep arrays: the resulting JSON will contain array for keys that are defined as repeatable elements in the XSD, even if there is only one element in the input XML.
@@ -37,7 +49,7 @@ Disadvantage of using an XML Schema:
 * slightly slower translation
 
 ## JSON to XML translation
-The com.mcsuka.xml.json package implements a JSON/XML translator, using the GSON, Xerces and Saxon-HE libraries.
+implementation: com.mcsuka.xml.json.Json2Xml\
 Translation may or may not use an XML Schema. Using an XML schema has the following advantages:
 * add correct name space to the elements and attributes
 * correct the order of the elements for 'sequence' indicator
@@ -52,3 +64,31 @@ Disadvantage of using an XML Schema:
 * slightly slower translation
 
 JSON to XML translation will modify the JSON keys that are not XML element-name compatible. All non-compatible characters will be replaced with an underscore character. Please note, there is no guarantee that the XML produced by the translator is valid (to the schema).
+
+## XML Schema to JSON Schema translation
+implementation: com.mcsuka.xml.json.Xsd2JsonSchema
+
+## REST to SOAP translation
+implementation: com.mcsuka.xml.http.Rest2SoapTransformer, com.mcsuka.xml.http.OasGenerator\
+This library enables exposing legacy SOAP services as a REST API. The REST API is a collection of endpoints, each endpoint configured by:
+* a URL to the SOAP WSDL (this may be the same for multiple or all of the endpoints)
+* the SOAP operation name in the WSDL (API specification is constructed from the WSDL)
+* the URL of the SOAP service
+* the Path where the REST endpoint is exposed (this may contain path variables)
+* the HTTP method of the REST endpoint (get/post/put/patch/delete)
+* a list of REST request parameters
+  * these may be path, query or header variables
+  * they can be mapped to an XML element in the SOAP request
+  * their type can be specified
+
+## Demo REST to SOAP Proxy application
+implementation: com.mcsuka.xml.proxy.RestToSoapProxyApp\
+Please note, this is a demo application, not for production use. It is meant to give guidance on how to expose legacy SOAP services as a REST API.
+
+compile: `mvn clean compile assembly:single`
+
+run: `java -cp target/xmlxsdjson-0.1-jar-with-dependencies.jar com.mcsuka.xml.proxy.RestToSoapProxyApp "config/resttosoapproxy.properties"`
+
+## Demo SOAP Service
+implementation: in the separate soapserver module\
+This is a modified copy of the WSDL First Demo of the Apache CXF project (https://github.com/apache/cxf). For more info, please refer to [soapserver/README.txt]()
