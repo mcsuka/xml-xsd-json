@@ -83,11 +83,19 @@ This library enables exposing legacy SOAP services as a REST API. The REST API i
 
 ## Demo REST to SOAP Proxy application
 implementation: com.mcsuka.xml.proxy.RestToSoapProxyApp\
-Please note, this is a demo application, not for production use. It is meant to give guidance on how to expose legacy SOAP services as a REST API.
+This is a simple, configurable proxy application that can expose SOAP services as a REST API:
+* The API is configured via a single .properties file and SOAP WSDL(s)
+* The API specification is exposed as an OAS 3.0 document
+* It contains a Swagger distributable UI for easy testing
+
+Please note, this is a demo application, not advised for production use. It is meant to give guidance on how to expose legacy SOAP services with minimum effort as a REST API,  in your own choice of Java, Scala or Kotlin frameworks.
 
 compile: `mvn clean compile assembly:single`
 
 run: `java -cp target/xmlxsdjson-0.1-jar-with-dependencies.jar com.mcsuka.xml.proxy.RestToSoapProxyApp "config/resttosoapproxy.properties"`
+
+OAS: `http://localhost:8080/oas.json` \
+Swagger UI: `http://localhost:8080/swagger/`
 
 ## Demo SOAP Service
 implementation: in the separate soapserver module\
