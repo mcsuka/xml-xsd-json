@@ -81,6 +81,11 @@ This library enables exposing legacy SOAP services as a REST API. The REST API i
   * they can be mapped to an XML element in the SOAP request
   * their type can be specified
 
+Limitations:
+* The SOAP messages (in/out) must contain at least 2 levels of elements
+  * e.g. `<SOAP-ENV:Body><ns0:root><value>42</value></ns0:root></SOAP-ENV:Body>`
+  * the following will be invalid: `<SOAP-ENV:Body><value>42</value></SOAP-ENV:Body>`
+
 ## Demo REST to SOAP Proxy application
 implementation: com.mcsuka.xml.proxy.RestToSoapProxyApp\
 This is a simple, configurable proxy application that can expose SOAP services as a REST API:
