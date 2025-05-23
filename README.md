@@ -68,6 +68,9 @@ JSON to XML translation will modify the JSON keys that are not XML element-name 
 ## XML Schema to JSON Schema translation
 implementation: com.mcsuka.xml.json.Xsd2JsonSchema
 
+A JSON Schema is a type of visualisation for an XML Schema, representing the output/input format of a schema-based XMLtoJSON/JSONtoXML translation.
+The schemas may come from a set of XSD files or a WSDL.
+
 ## REST to SOAP translation
 implementation: com.mcsuka.xml.http.Rest2SoapTransformer, com.mcsuka.xml.http.OasGenerator\
 This library enables exposing legacy SOAP services as a REST API. The REST API is a collection of endpoints, each endpoint configured by:
